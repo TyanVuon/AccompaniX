@@ -411,10 +411,7 @@ def sheet_to_midi_response(sheet):
     Convert the provided sheet to midi and send it as a file
     """
     midiFile = sheet.write('midi')
-    return flask.send_file(midiFile, mimetype="audio/midi",
-                           cache_timeout=-1  # disable cache
-                           )
-
+    return flask.send_file(midiFile, mimetype="audio/midi")
 
 def sheet_to_mp3_response(sheet):
     """Generate and send MP3 file
