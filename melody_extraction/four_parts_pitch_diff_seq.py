@@ -6,7 +6,7 @@ def get_melody(score):
     melody_parts = []
     for part in score.parts:
         melody_stream = stream.Stream([part])
-        melody = melody_stream.flat.notes
+        melody = list(melody_stream.flatten().notes)
         int_seq = [0] * (len(melody) - 1)
         for i in range(1, len(melody)):
             int_seq[i-1] = melody[i].pitch.midi - melody[i-1].pitch.midi

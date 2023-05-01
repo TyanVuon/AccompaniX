@@ -84,6 +84,15 @@ class VoiceModel(nn.Module):
             nn.Linear(hidden_size_linear, self.num_notes_per_voice[main_voice_index])
         )
 
+        if torch.cuda.is_available():
+            device = torch.device("cuda")
+            print(f'Training on {torch.cuda.get_device_name(device)}')
+        else:
+            device = torch.device("cpu")
+            print('Training on CPU')
+        self.device = device
+        self.to(device)
+
     def forward(self, *input):
         notes, metas = input
         batch_size, num_voices, timesteps_ticks = notes[0].size()
@@ -206,6 +215,7 @@ class VoiceModel(nn.Module):
                f'{self.dropout_lstm},' \
                f'{self.hidden_size_linear}' \
                f')'
+
 
     def train_model(self,
                     batch_size=16,

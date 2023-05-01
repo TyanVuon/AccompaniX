@@ -1,6 +1,12 @@
 """
 @author: Gaetan Hadjeres
 """
+import os
+
+os.environ['CUDA_HOME'] = 'C:\\Users\\Tyan\\MayBach\\cuda and cudnn lib\\cuda'
+os.environ['PATH'] = os.environ['PATH'] + ';C:\\Users\\Tyan\\MayBach\\cuda and cudnn lib\\cuda\\bin'
+os.environ['CUDNN_HOME'] = 'C:\\Users\\Tyan\\MayBach\\cuda and cudnn lib\\cudnn'
+os.environ['PATH'] = os.environ['PATH'] + ';C:\\Users\\Tyan\\MayBach\\cuda and cudnn lib\\cudnn\\bin'
 
 from DatasetManager.metadata import FermataMetadata
 import numpy as np
