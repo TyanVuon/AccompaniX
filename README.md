@@ -1,3 +1,5 @@
+![]("C:\Users\Tyan\Oct19thDeepBach\DeepBachTyan\spiegel.jpg")
+
 # AccompaniX
 This repository is a tentative adaptation of the DeepBach model, addressing the coherence challenges in AI music generation. 
 The project builds on the foundational work of DeepBach: a Steerable Model for Bach Chorales Generation.

@@ -29,14 +29,16 @@ metadata_values = {
 class VoiceModel(nn.Module):
     def __init__(self,
                  dataset: ChoraleDataset,
-                 main_voice_index: int,
-                 note_embedding_dim: int,
-                 meta_embedding_dim: int,
-                 num_layers: int,
-                 lstm_hidden_size: int,
-                 dropout_lstm: float,
+                 main_voice_index: 1,
+                 note_embedding_dim: 108,
+                 meta_embedding_dim: 25,
+                 num_layers: 2,
+                 lstm_hidden_size: 512,
+                 dropout_lstm: 0.5,
                  hidden_size_linear=200,
-                 ):
+
+
+    ):
 
         super(VoiceModel, self).__init__()
         self.dataset = dataset
