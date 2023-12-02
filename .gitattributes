@@ -1,11 +1,1 @@
-# Track entire folders with Git LFS
-DatasetManager/dataset_cache/* filter=lfs diff=lfs merge=lfs -text
-DeepBach/models/* filter=lfs diff=lfs merge=lfs -text
-C:/Users/Tyan/Oct19thDeepBach/DeepBachTyan/resources/dataset_cache/tensor_datasets/ChoraleDataset([0] filter=lfs diff=lfs merge=lfs -text
-bach_chorales filter=lfs diff=lfs merge=lfs -text
-['fermata' filter=lfs diff=lfs merge=lfs -text
-'tick' filter=lfs diff=lfs merge=lfs -text
-'key'] filter=lfs diff=lfs merge=lfs -text
-8 filter=lfs diff=lfs merge=lfs -text
-4) filter=lfs diff=lfs merge=lfs -text
-resources/dataset_cache/tensor_datasets/ChoraleDataset([0],bach_chorales,['fermata',[[:space:]]'tick',[[:space:]]'key'],8,4) filter=lfs diff=lfs merge=lfs -text
+resources\dataset_cache\tensor_datasets\choraledataset([0],bach_chorales,['fermata', 'tick', 'key'],8,4) filter=lfs diff=lfs merge=lfs -text
