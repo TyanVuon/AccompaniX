@@ -3,12 +3,13 @@
 """
 
 import click
-
+import torch
 from DatasetManager.chorale_dataset import ChoraleDataset
 from DatasetManager.dataset_manager import DatasetManager
 from DatasetManager.metadata import FermataMetadata, TickMetadata, KeyMetadata
 
 from DeepBach.model_manager import DeepBach
+
 
 
 @click.command()
@@ -25,7 +26,8 @@ from DeepBach.model_manager import DeepBach
 @click.option('--linear_hidden_size', default=256,
               help='hidden size of the Linear layers')
 @click.option('--batch_size', default=256,
-              help='training batch size')
+              help='training '
+                   'batch size')
 @click.option('--num_epochs', default=5,
               help='number of training epochs')
 @click.option('--train', is_flag=True,
@@ -34,6 +36,15 @@ from DeepBach.model_manager import DeepBach
               help='number of parallel pseudo-Gibbs sampling iterations')
 @click.option('--sequence_length_ticks', default=64,
               help='length of the generated chorale (in ticks)')
+@click.option('--load', is_flag=True, help='Load a model')
+@click.option('--batch_size', type=int, help='Model batch size')
+@click.option('--num_epochs', type=int, help='Model number of epochs')
+@click.option('--num_iterations', type=int, default='100', help='Model number of iterations')
+@click.option('--timestamp', type=str, help='Model timestamp')
+@click.option('--weights_paths', default='',
+              help='Comma-separated paths to the weight files for each voice model')
+
+
 def main(note_embedding_dim,
          meta_embedding_dim,
          num_layers,
@@ -45,7 +56,11 @@ def main(note_embedding_dim,
          train,
          num_iterations,
          sequence_length_ticks,
+         load,
+         timestamp,
+         weights_paths
          ):
+
     dataset_manager = DatasetManager()
 
     metadatas = [
@@ -75,14 +90,35 @@ def main(note_embedding_dim,
         linear_hidden_size=linear_hidden_size
     )
 
+    # Inside main() function
     if train:
-        deepbach.train(batch_size=batch_size,
-                       num_epochs=num_epochs)
-    else:
-        deepbach.load()
+        ## Load weights if provided
+        if weights_paths:
+            weights_paths_list = weights_paths.split(',')
+            if len(weights_paths_list) != 4:
+                raise ValueError("Expected 4 weight files for the 4 voice models")
+            for i, weight_path in enumerate(weights_paths_list):
+                deepbach.voice_models[i].load_state_dict(torch.load(weight_path))
+                print(f"Loaded weights for voice {i} from {weight_path}")
+
+        deepbach.train(batch_size=batch_size, num_epochs=num_epochs)
+    elif load:
+        if num_iterations == 'None':
+            num_iterations = None
+        else:
+            num_iterations = int(num_iterations)
+        deepbach.load(batch_size=batch_size, num_epochs=num_epochs, num_iterations=num_iterations, timestamp=timestamp)
         deepbach.cuda()
 
     print('Generation')
+    if weights_paths:
+        weights_paths_list = weights_paths.split(',')
+        if len(weights_paths_list) != 4:
+            raise ValueError("Expected 4 weight files for the 4 voice models")
+        for i, weight_path in enumerate(weights_paths_list):
+            deepbach.voice_models[i].load_state_dict(torch.load(weight_path))
+            print(f"Loaded weights for voice {i} from {weight_path}")
+
     score, tensor_chorale, tensor_metadata = deepbach.generation(
         num_iterations=num_iterations,
         sequence_length_ticks=sequence_length_ticks,

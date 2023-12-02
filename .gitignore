@@ -107,6 +107,7 @@ good_model/
 generated_examples/
 DeepBach/datasets/raw_dataset/*.pickle
 DeepBach/datasets/custom_dataset/*.pickle
+melody_extraction/
 
 *.tar.gz
 !download_pretrained_data.sh

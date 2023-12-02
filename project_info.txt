@@ -1,0 +1,706 @@
+ Volume in drive C is Windows
+ Volume Serial Number is F231-2FE7
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan
+
+2023/03/17  09:34    <DIR>          .
+2023/03/04  04:50    <DIR>          ..
+2023/03/04  03:30             1,566 .gitignore
+2023/03/17  09:29    <DIR>          .idea
+2023/03/04  03:58                 0 app.log
+2023/03/04  03:30               471 cog.yaml
+2023/03/06  03:00    <DIR>          DatasetManager
+2023/03/04  08:13    <DIR>          DeepBach
+2023/03/04  10:57             3,116 deepBach.py
+2023/03/04  03:30             7,974 deepBachMuseScore.qml
+2023/03/04  03:43        50,225,895 deepbach_pytorch_resources.tar
+2023/03/04  03:30               310 dl_dataset_and_models.sh
+2023/03/04  03:30               379 Dockerfile
+2023/03/04  03:30               106 entrypoint.sh
+2023/03/04  03:30             1,498 environment.yml
+2023/03/03  04:03            14,641 flask_server.py
+2023/03/06  02:25               101 GPUcheckup.py
+2023/03/06  18:05               429 indexMismatch testing.py
+2023/03/04  03:30             1,163 LICENSE
+2023/03/06  03:00    <DIR>          models
+2023/03/04  03:30            10,962 musescore_flask_server.py
+2023/03/04  07:43    <DIR>          outputs
+2023/03/04  03:30             3,981 predict.py
+2023/03/17  09:34                 0 project_structure.txt
+2023/03/04  03:30             5,125 README.md
+2023/03/04  11:19             1,304 requirements.txt
+2023/03/05  01:25               406 structure.py
+2023/03/04  07:43    <DIR>          utils
+2023/03/06  17:17    <DIR>          __pycache__
+              20 File(s)     50,279,427 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git
+
+2023/03/17  09:34    <DIR>          ..
+2023/03/04  11:23                19 COMMIT_EDITMSG
+2023/03/04  03:30               482 config
+2023/03/04  03:25                73 description
+2023/03/04  11:52               232 FETCH_HEAD
+2023/03/04  03:30                23 HEAD
+2023/03/04  03:25    <DIR>          hooks
+2023/03/04  11:20             2,689 index
+2023/03/04  03:25    <DIR>          info
+2023/03/04  03:30    <DIR>          logs
+2023/03/04  11:52    <DIR>          objects
+2023/03/04  03:30               114 packed-refs
+2023/03/04  03:30    <DIR>          refs
+               7 File(s)          3,632 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\hooks
+
+2023/03/04  03:25    <DIR>          .
+2023/03/04  03:25               478 applypatch-msg.sample
+2023/03/04  03:25               896 commit-msg.sample
+2023/03/04  03:25             4,726 fsmonitor-watchman.sample
+2023/03/04  03:25               189 post-update.sample
+2023/03/04  03:25               424 pre-applypatch.sample
+2023/03/04  03:25             1,643 pre-commit.sample
+2023/03/04  03:25               416 pre-merge-commit.sample
+2023/03/04  03:25             1,374 pre-push.sample
+2023/03/04  03:25             4,898 pre-rebase.sample
+2023/03/04  03:25               544 pre-receive.sample
+2023/03/04  03:25             1,492 prepare-commit-msg.sample
+2023/03/04  03:25             2,783 push-to-checkout.sample
+2023/03/04  03:25             3,650 update.sample
+              13 File(s)         23,513 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\info
+
+2023/03/04  03:25    <DIR>          .
+2023/03/04  03:25               240 exclude
+               1 File(s)            240 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\logs
+
+2023/03/04  03:30    <DIR>          .
+2023/03/04  11:20               367 HEAD
+2023/03/04  03:30    <DIR>          refs
+               1 File(s)            367 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\logs\refs
+
+2023/03/04  03:30    <DIR>          .
+2023/03/04  03:30    <DIR>          ..
+2023/03/04  03:30    <DIR>          heads
+2023/03/04  03:34    <DIR>          remotes
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\logs\refs\heads
+
+2023/03/04  03:30    <DIR>          .
+2023/03/04  03:30    <DIR>          ..
+2023/03/04  11:20               367 master
+               1 File(s)            367 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\logs\refs\remotes
+
+2023/03/04  03:34    <DIR>          .
+2023/03/04  03:30    <DIR>          ..
+2023/03/04  03:30    <DIR>          origin
+2023/03/04  03:34    <DIR>          upstream
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\logs\refs\remotes\origin
+
+2023/03/04  03:30    <DIR>          .
+2023/03/04  03:34    <DIR>          ..
+2023/03/04  11:52               936 HEAD
+               1 File(s)            936 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\logs\refs\remotes\upstream
+
+2023/03/04  03:34    <DIR>          .
+2023/03/04  03:34    <DIR>          ..
+2023/03/04  11:52               740 HEAD
+2023/03/04  03:34               218 master
+2023/03/04  03:34               218 original_keras
+               3 File(s)          1,176 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\objects
+
+2023/03/04  11:52    <DIR>          .
+2023/03/04  11:20    <DIR>          1d
+2023/03/04  11:20    <DIR>          27
+2023/03/04  03:36    <DIR>          4b
+2023/03/04  11:20    <DIR>          6e
+2023/03/04  11:20    <DIR>          7c
+2023/03/04  11:20    <DIR>          85
+2023/03/04  11:20    <DIR>          b2
+2023/03/04  11:20    <DIR>          b6
+2023/03/04  11:20    <DIR>          ca
+2023/03/04  03:44    <DIR>          ce
+2023/03/04  08:00    <DIR>          d1
+2023/03/04  03:25    <DIR>          info
+2023/03/04  03:30    <DIR>          pack
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\objects\1d
+
+2023/03/04  11:20    <DIR>          .
+2023/03/04  11:52    <DIR>          ..
+2023/03/04  11:20               102 ac21af483207f117e3943acf32e5a37230b470
+               1 File(s)            102 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\objects\27
+
+2023/03/04  11:20    <DIR>          .
+2023/03/04  11:52    <DIR>          ..
+2023/03/04  11:20             4,759 ba8c41cb35b503e51bb9008b9a3248d776ce06
+               1 File(s)          4,759 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\objects\4b
+
+2023/03/04  03:36    <DIR>          .
+2023/03/04  11:52    <DIR>          ..
+2023/03/04  03:36               425 e53f1dd3f2604c1ccdef1da9fb31540ecffa70
+               1 File(s)            425 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\objects\6e
+
+2023/03/04  11:20    <DIR>          .
+2023/03/04  11:52    <DIR>          ..
+2023/03/04  11:20               981 efc7955db6114e380f27951e01d4df2514bb11
+               1 File(s)            981 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\objects\7c
+
+2023/03/04  11:20    <DIR>          .
+2023/03/04  11:52    <DIR>          ..
+2023/03/04  11:20               633 ed7a137bb248eae6108cc1e1f32b69ef4513e6
+               1 File(s)            633 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\objects\85
+
+2023/03/04  11:20    <DIR>          .
+2023/03/04  11:52    <DIR>          ..
+2023/03/04  11:20               254 b534404486cceaa23e42b5051f30534172c1c5
+               1 File(s)            254 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\objects\b2
+
+2023/03/04  11:20    <DIR>          .
+2023/03/04  11:52    <DIR>          ..
+2023/03/04  11:20               711 2d8a4f78b9811a6ef5b595b2f02abfd5db9004
+               1 File(s)            711 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\objects\b6
+
+2023/03/04  11:20    <DIR>          .
+2023/03/04  11:52    <DIR>          ..
+2023/03/04  11:20                55 a1c769721c14926751c50049dd53664d508655
+               1 File(s)             55 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\objects\ca
+
+2023/03/04  11:20    <DIR>          .
+2023/03/04  11:52    <DIR>          ..
+2023/03/04  11:20               175 4e253f93ae931ba54e702cbfc6cfa3e58aef60
+               1 File(s)            175 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\objects\ce
+
+2023/03/04  03:44    <DIR>          .
+2023/03/04  11:52    <DIR>          ..
+2023/03/04  11:20        41,505,111 179fba777e3fa293f5e6cbb06e927274c55392
+               1 File(s)     41,505,111 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\objects\d1
+
+2023/03/04  08:00    <DIR>          .
+2023/03/04  11:52    <DIR>          ..
+2023/03/04  08:00        61,608,022 d8a5080ea4b0be9e4d0525efd9e2c22925f7d2
+               1 File(s)     61,608,022 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\objects\info
+
+2023/03/04  03:25    <DIR>          .
+2023/03/04  11:52    <DIR>          ..
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\objects\pack
+
+2023/03/04  03:30    <DIR>          .
+2023/03/04  11:52    <DIR>          ..
+2023/03/04  03:30            18,796 pack-68efbc08153a9a2f1b764c7b799fe2b84852f87d.idx
+2023/03/04  03:30       233,215,429 pack-68efbc08153a9a2f1b764c7b799fe2b84852f87d.pack
+               2 File(s)    233,234,225 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\refs
+
+2023/03/04  03:30    <DIR>          .
+2023/03/04  11:20    <DIR>          heads
+2023/03/04  03:34    <DIR>          remotes
+2023/03/04  03:34    <DIR>          tags
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\refs\heads
+
+2023/03/04  11:20    <DIR>          .
+2023/03/04  03:30    <DIR>          ..
+2023/03/04  11:20                41 master
+               1 File(s)             41 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\refs\remotes
+
+2023/03/04  03:34    <DIR>          .
+2023/03/04  03:30    <DIR>          ..
+2023/03/04  11:52    <DIR>          origin
+2023/03/04  11:52    <DIR>          upstream
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\refs\remotes\origin
+
+2023/03/04  11:52    <DIR>          .
+2023/03/04  03:34    <DIR>          ..
+2023/03/04  11:52                32 HEAD
+               1 File(s)             32 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\refs\remotes\upstream
+
+2023/03/04  11:52    <DIR>          .
+2023/03/04  03:34    <DIR>          ..
+2023/03/04  11:52                34 HEAD
+2023/03/04  03:34                41 master
+2023/03/04  03:34                41 original_keras
+               3 File(s)            116 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.git\refs\tags
+
+2023/03/04  03:34    <DIR>          .
+2023/03/04  03:30    <DIR>          ..
+2023/03/04  03:34                41 v1.0
+2023/03/04  03:34                41 v2.0
+               2 File(s)             82 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.idea
+
+2023/03/17  09:29    <DIR>          .
+2023/03/17  09:34    <DIR>          ..
+2023/03/04  03:35               184 .gitignore
+2023/03/04  03:50               705 DeepBachTyan.iml
+2023/03/04  03:35    <DIR>          inspectionProfiles
+2023/03/04  03:50               204 misc.xml
+2023/03/04  03:35               283 modules.xml
+2023/03/04  03:35               185 vcs.xml
+2023/03/17  09:29             9,819 workspace.xml
+               6 File(s)         11,380 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\.idea\inspectionProfiles
+
+2023/03/04  03:35    <DIR>          .
+2023/03/17  09:29    <DIR>          ..
+2023/03/04  03:35               174 profiles_settings.xml
+               1 File(s)            174 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\DatasetManager
+
+2023/03/06  03:00    <DIR>          .
+2023/03/17  09:34    <DIR>          ..
+2023/03/04  03:30            27,375 chorale_dataset.py
+2023/03/04  07:56    <DIR>          datasets
+2023/03/04  03:54    <DIR>          dataset_cache
+2023/03/04  03:30             4,487 dataset_manager.py
+2023/03/04  03:30             2,382 helpers.py
+2023/03/04  03:30             8,672 metadata.py
+2023/03/04  03:30             6,370 music_dataset.py
+2023/03/04  03:30                 0 __init__.py
+2023/03/04  11:05    <DIR>          __pycache__
+               6 File(s)         49,286 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\DatasetManager\datasets
+
+2023/03/04  07:56    <DIR>          .
+2023/03/06  03:00    <DIR>          ..
+2023/03/06  18:32    <DIR>          bach_chorales
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\DatasetManager\datasets\bach_chorales
+
+2023/03/06  18:32    <DIR>          .
+2023/03/04  07:56    <DIR>          ..
+2018/06/04  05:48     1,002,667,375 ChoraleDataset([0],bach_chorales,['fermata', 'tick', 'key'],8,4)
+               1 File(s)  1,002,667,375 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\DatasetManager\dataset_cache
+
+2023/03/04  03:54    <DIR>          .
+2023/03/06  03:00    <DIR>          ..
+2023/03/04  13:39    <DIR>          datasets
+2023/03/06  20:15    <DIR>          tensor_datasets
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\DatasetManager\dataset_cache\datasets
+
+2023/03/04  13:39    <DIR>          .
+2023/03/04  03:54    <DIR>          ..
+2018/07/12  02:56             5,380 ChoraleDataset([0, 1, 2, 3],bach_chorales,['fermata', 'tick', 'key'],8,4)
+               1 File(s)          5,380 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\DatasetManager\dataset_cache\tensor_datasets
+
+2023/03/06  20:15    <DIR>          .
+2023/03/04  03:54    <DIR>          ..
+2023/03/06  20:15     2,736,951,343 ChoraleDataset([0, 1, 2, 3],bach_chorales,['fermata', 'tick', 'key'],8,4)
+2018/06/04  05:48     1,002,667,375 ChoraleDataset([0],bach_chorales,['fermata', 'tick', 'key'],8,4)
+               2 File(s)  3,739,618,718 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\DatasetManager\__pycache__
+
+2023/03/04  11:05    <DIR>          .
+2023/03/06  03:00    <DIR>          ..
+2023/03/04  03:56            17,613 chorale_dataset.cpython-310.pyc
+2023/03/04  11:05            33,388 chorale_dataset.cpython-311.pyc
+2023/03/04  03:54            17,777 chorale_dataset.cpython-37.pyc
+2023/03/04  03:57             3,034 dataset_manager.cpython-310.pyc
+2023/03/04  03:54             2,953 dataset_manager.cpython-37.pyc
+2023/03/04  03:57             2,208 helpers.cpython-310.pyc
+2023/03/04  03:54             2,163 helpers.cpython-37.pyc
+2023/03/04  03:57             8,833 metadata.cpython-310.pyc
+2023/03/04  03:54             9,270 metadata.cpython-37.pyc
+2023/03/04  03:57             6,005 music_dataset.cpython-310.pyc
+2023/03/04  03:54             5,981 music_dataset.cpython-37.pyc
+2023/03/04  03:56               152 __init__.cpython-310.pyc
+2023/03/04  11:05               168 __init__.cpython-311.pyc
+2023/03/04  03:54               146 __init__.cpython-37.pyc
+              14 File(s)        109,691 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\DeepBach
+
+2023/03/04  08:13    <DIR>          .
+2023/03/17  09:34    <DIR>          ..
+2023/03/04  03:30               953 data_utils.py
+2023/03/04  03:30               849 helpers.py
+2023/03/04  03:30             7,750 metadata.py
+2023/03/04  03:30            13,554 model_manager.py
+2023/03/04  03:30            13,603 voice_model.py
+2023/03/04  03:30                 0 __init__.py
+2023/03/04  03:57    <DIR>          __pycache__
+               6 File(s)         36,709 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\DeepBach\__pycache__
+
+2023/03/04  03:57    <DIR>          .
+2023/03/04  08:13    <DIR>          ..
+2023/03/04  03:57             1,303 data_utils.cpython-310.pyc
+2023/03/04  03:54             1,317 data_utils.cpython-37.pyc
+2023/03/04  03:57               880 helpers.cpython-310.pyc
+2023/03/04  03:54               870 helpers.cpython-37.pyc
+2023/03/04  03:57             7,839 model_manager.cpython-310.pyc
+2023/03/04  03:54             7,877 model_manager.cpython-37.pyc
+2023/03/04  03:57             9,267 voice_model.cpython-310.pyc
+2023/03/04  03:54             9,077 voice_model.cpython-37.pyc
+2023/03/04  03:57               146 __init__.cpython-310.pyc
+2023/03/04  03:54               140 __init__.cpython-37.pyc
+              10 File(s)         38,716 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\models
+
+2023/03/06  03:00    <DIR>          .
+2023/03/17  09:34    <DIR>          ..
+2019/01/10  01:52                 1 .README
+2018/07/12  03:38         8,919,356 VoiceModel(ChoraleDataset([0, 1, 2, 3],bach_chorales,['fermata', 'tick', 'key'],8,4),0,20,20,2,256,0.5,256)
+2018/07/12  03:56         8,926,552 VoiceModel(ChoraleDataset([0, 1, 2, 3],bach_chorales,['fermata', 'tick', 'key'],8,4),1,20,20,2,256,0.5,256)
+2018/07/12  04:14         8,923,468 VoiceModel(ChoraleDataset([0, 1, 2, 3],bach_chorales,['fermata', 'tick', 'key'],8,4),2,20,20,2,256,0.5,256)
+2018/07/12  04:31         8,944,028 VoiceModel(ChoraleDataset([0, 1, 2, 3],bach_chorales,['fermata', 'tick', 'key'],8,4),3,20,20,2,256,0.5,256)
+               5 File(s)     35,713,405 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\outputs
+
+2023/03/04  07:43    <DIR>          .
+2023/03/17  09:34    <DIR>          ..
+2023/03/04  07:43    <DIR>          checkpoint
+2023/03/04  07:43    <DIR>          generated_chorales
+2023/03/04  07:43    <DIR>          tensorboard
+2023/03/04  07:43    <DIR>          test_output
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\outputs\checkpoint
+
+2023/03/04  07:43    <DIR>          .
+2023/03/04  07:43    <DIR>          ..
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\outputs\generated_chorales
+
+2023/03/04  07:43    <DIR>          .
+2023/03/04  07:43    <DIR>          ..
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\outputs\tensorboard
+
+2023/03/04  07:43    <DIR>          .
+2023/03/04  07:43    <DIR>          ..
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\outputs\test_output
+
+2023/03/04  07:43    <DIR>          .
+2023/03/04  07:43    <DIR>          ..
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\utils
+
+2023/03/04  07:43    <DIR>          .
+2023/03/17  09:34    <DIR>          ..
+               0 File(s)              0 bytes
+
+ Directory of C:\Users\Tyan\DPBCT\DeepBachTyan\__pycache__
+
+2023/03/06  17:17    <DIR>          .
+2023/03/17  09:34    <DIR>          ..
+2023/03/06  17:17             2,453 deepBach.cpython-310.pyc
+               1 File(s)          2,453 bytes
+
+     Total Files Listed:
+             120 File(s)  5,164,918,669 bytes
+             139 Dir(s)  50,296,279,040 bytes free
+absl-py==1.2.0
+affine @ file:///home/conda/feedstock_root/build_artifacts/affine_1648309059244/work
+attrs @ file:///home/conda/feedstock_root/build_artifacts/attrs_1640799537051/work
+branca @ file:///home/conda/feedstock_root/build_artifacts/branca_1650311966802/work
+brotlipy @ file:///D:/bld/brotlipy_1648854347500/work
+certifi @ file:///C:/Windows/TEMP/abs_e9b7158a-aa56-4a5b-87b6-c00d295b01fanefpc8_o/croots/recipe/certifi_1655968940823/work/certifi
+cffi @ file:///D:/bld/cffi_1636046270630/work
+chardet==4.0.0
+charset-normalizer @ file:///home/conda/feedstock_root/build_artifacts/charset-normalizer_1644853463426/work
+click @ file:///D:/bld/click_1651215332191/work
+click-plugins==1.1.1
+cligj @ file:///home/conda/feedstock_root/build_artifacts/cligj_1633637764473/work
+cloudpickle @ file:///home/conda/feedstock_root/build_artifacts/cloudpickle_1653061851209/work
+colorama @ file:///home/conda/feedstock_root/build_artifacts/colorama_1602866480661/work
+cryptography @ file:///D:/bld/cryptography_1652967200171/work
+cycler @ file:///home/conda/feedstock_root/build_artifacts/cycler_1635519461629/work
+cytoolz==0.11.2
+dask @ file:///home/conda/feedstock_root/build_artifacts/dask-core_1653603260862/work
+decorator==5.1.1
+dm-tree==0.1.7
+earthpy @ file:///home/conda/feedstock_root/build_artifacts/earthpy_1633375388791/work
+filelock==3.9.0
+Fiona==1.8.21
+Flask==2.1.2
+Flask-Cors @ file:///tmp/build/80754af9/flask_cors_1614875208036/work
+folium @ file:///home/conda/feedstock_root/build_artifacts/folium_1638560701663/work
+fonttools @ file:///D:/bld/fonttools_1651018175663/work
+fsspec @ file:///home/conda/feedstock_root/build_artifacts/fsspec_1653010523205/work
+gast==0.5.3
+GDAL==3.4.3
+geopandas @ file:///home/conda/feedstock_root/build_artifacts/geopandas_1638382567988/work
+idna @ file:///home/conda/feedstock_root/build_artifacts/idna_1642433548627/work
+imagecodecs @ file:///D:/bld/imagecodecs_1652926088012/work
+imageio @ file:///home/conda/feedstock_root/build_artifacts/imageio_1654071881944/work
+itsdangerous==2.1.2
+Jinja2 @ file:///home/conda/feedstock_root/build_artifacts/jinja2_1654302431367/work
+joblib @ file:///home/conda/feedstock_root/build_artifacts/joblib_1633637554808/work
+jsonpickle==2.2.0
+kiwisolver @ file:///D:/bld/kiwisolver_1648854574371/work
+locket @ file:///home/conda/feedstock_root/build_artifacts/locket_1650660393415/work
+mapclassify @ file:///home/conda/feedstock_root/build_artifacts/mapclassify_1627363180059/work
+MarkupSafe @ file:///D:/bld/markupsafe_1648737731599/work
+matplotlib @ file:///D:/bld/matplotlib-suite_1651609712471/work
+more-itertools==8.13.0
+mpmath==1.3.0
+munch==2.5.0
+munkres==1.1.4
+music21==9.1.0
+networkx @ file:///home/conda/feedstock_root/build_artifacts/networkx_1654375205989/work
+numpy @ file:///D:/bld/numpy_1653325554875/work
+packaging @ file:///home/conda/feedstock_root/build_artifacts/packaging_1637239678211/work
+pandas @ file:///D:/bld/pandas_1653497263811/work
+partd @ file:///home/conda/feedstock_root/build_artifacts/partd_1617910651905/work
+Pillow @ file:///D:/bld/pillow_1652815234323/work
+protobuf==4.21.4
+pycparser @ file:///home/conda/feedstock_root/build_artifacts/pycparser_1636257122734/work
+pyOpenSSL @ file:///home/conda/feedstock_root/build_artifacts/pyopenssl_1643496850550/work
+pyparsing @ file:///home/conda/feedstock_root/build_artifacts/pyparsing_1652235407899/work
+pyproj @ file:///D:/bld/pyproj_1650804164778/work
+PySocks @ file:///D:/bld/pysocks_1648857426124/work
+python-dateutil @ file:///home/conda/feedstock_root/build_artifacts/python-dateutil_1626286286081/work
+pytz @ file:///home/conda/feedstock_root/build_artifacts/pytz_1647961439546/work
+PyWavelets @ file:///D:/bld/pywavelets_1649616540540/work
+PyYAML @ file:///D:/bld/pyyaml_1648757288117/work
+rasterio==1.2.10
+requests @ file:///home/conda/feedstock_root/build_artifacts/requests_1641580202195/work
+Rtree @ file:///D:/bld/rtree_1649367817754/work
+scikit-image @ file:///D:/bld/scikit-image_1645197082109/work
+scikit-learn @ file:///D:/bld/scikit-learn_1652976942320/work
+scipy @ file:///C:/bld/scipy_1653074056978/work
+Shapely==1.8.2
+six @ file:///home/conda/feedstock_root/build_artifacts/six_1620240208055/work
+snuggs==1.4.7
+sympy==1.12
+tensorflow-gan==2.1.0
+tensorflow-hub==0.12.0
+tensorflow-probability==0.17.0
+threadpoolctl @ file:///home/conda/feedstock_root/build_artifacts/threadpoolctl_1643647933166/work
+tifffile @ file:///home/conda/feedstock_root/build_artifacts/tifffile_1651666912743/work
+toolz @ file:///home/conda/feedstock_root/build_artifacts/toolz_1636177962100/work
+torch==2.1.0+cu121
+torchaudio==2.1.0+cu121
+torchvision==0.16.0+cu121
+tqdm @ file:///home/conda/feedstock_root/build_artifacts/tqdm_1649051611147/work
+typing_extensions==4.2.0
+unicodedata2 @ file:///D:/bld/unicodedata2_1649112137711/work
+urllib3 @ file:///home/conda/feedstock_root/build_artifacts/urllib3_1647489083693/work
+webcolors==1.12
+Werkzeug==2.1.2
+win-inet-pton @ file:///D:/bld/win_inet_pton_1648771897787/work
+xyzservices @ file:///home/conda/feedstock_root/build_artifacts/xyzservices_1649934406482/work
+Package                Version
+---------------------- ------------
+absl-py                1.2.0
+affine                 2.3.1
+attrs                  21.4.0
+branca                 0.5.0
+brotlipy               0.7.0
+certifi                2022.6.15
+cffi                   1.15.0
+chardet                4.0.0
+charset-normalizer     2.0.12
+click                  8.1.3
+click-plugins          1.1.1
+cligj                  0.7.2
+cloudpickle            2.1.0
+colorama               0.4.4
+cryptography           37.0.2
+cycler                 0.11.0
+cytoolz                0.11.2
+dask                   2022.5.2
+decorator              5.1.1
+dm-tree                0.1.7
+earthpy                0.9.4
+filelock               3.9.0
+Fiona                  1.8.21
+Flask                  2.1.2
+Flask-Cors             3.0.10
+folium                 0.12.1.post1
+fonttools              4.33.3
+fsspec                 2022.5.0
+gast                   0.5.3
+GDAL                   3.4.3
+geopandas              0.10.2
+idna                   3.3
+imagecodecs            2022.2.22
+imageio                2.19.3
+itsdangerous           2.1.2
+Jinja2                 3.1.2
+joblib                 1.1.0
+jsonpickle             2.2.0
+kiwisolver             1.4.2
+locket                 1.0.0
+mapclassify            2.4.3
+MarkupSafe             2.1.1
+matplotlib             3.5.2
+more-itertools         8.13.0
+mpmath                 1.3.0
+munch                  2.5.0
+munkres                1.1.4
+music21                9.1.0
+networkx               2.8.3
+numpy                  1.22.4
+packaging              21.3
+pandas                 1.4.2
+partd                  1.2.0
+Pillow                 9.1.1
+pip                    22.1.2
+protobuf               4.21.4
+pycparser              2.21
+pyOpenSSL              22.0.0
+pyparsing              3.0.9
+pyproj                 3.3.1
+PySocks                1.7.1
+python-dateutil        2.8.2
+pytz                   2022.1
+PyWavelets             1.3.0
+PyYAML                 6.0
+rasterio               1.2.10
+requests               2.27.1
+Rtree                  1.0.0
+scikit-image           0.19.2
+scikit-learn           1.1.1
+scipy                  1.8.1
+setuptools             62.3.2
+Shapely                1.8.2
+six                    1.16.0
+snuggs                 1.4.7
+sympy                  1.12
+tensorflow-gan         2.1.0
+tensorflow-hub         0.12.0
+tensorflow-probability 0.17.0
+threadpoolctl          3.1.0
+tifffile               2022.5.4
+toolz                  0.11.2
+torch                  2.1.0+cu121
+torchaudio             2.1.0+cu121
+torchvision            0.16.0+cu121
+tqdm                   4.64.0
+typing_extensions      4.2.0
+unicodedata2           14.0.0
+urllib3                1.26.9
+webcolors              1.12
+Werkzeug               2.1.2
+wheel                  0.37.1
+win-inet-pton          1.1.0
+xyzservices            2022.4.0
+name: deepbach_pytorch
+channels:
+  - pytorch
+  - defaults
+dependencies:
+  - blas=1.0=mkl
+  - ca-certificates=2018.03.07=0
+  - certifi=2018.11.29=py36_0
+  - cffi=1.11.5=py36he75722e_1
+  - click=7.0=py36_0
+  - freetype=2.9.1=h8a8886c_1
+  - intel-openmp=2019.1=144
+  - jpeg=9b=h024ee3a_2
+  - libedit=3.1.20170329=h6b74fdf_2
+  - libffi=3.2.1=hd88cf55_4
+  - libgcc-ng=8.2.0=hdf63c60_1
+  - libgfortran-ng=7.3.0=hdf63c60_0
+  - libpng=1.6.35=hbc83047_0
+  - libstdcxx-ng=8.2.0=hdf63c60_1
+  - libtiff=4.0.9=he85c1e1_2
+  - mkl=2019.1=144
+  - mkl_fft=1.0.6=py36hd81dba3_0
+  - mkl_random=1.0.2=py36hd81dba3_0
+  - ncurses=6.1=he6710b0_1
+  - ninja=1.8.2=py36h6bb024c_1
+  - numpy=1.15.4=py36h7e9f1db_0
+  - numpy-base=1.15.4=py36hde5b4d6_0
+  - olefile=0.46=py36_0
+  - openssl=1.1.1a=h7b6447c_0
+  - pillow=5.3.0=py36h34e0f95_0
+  - pip=18.1=py36_0
+  - pycparser=2.19=py36_0
+  - python=3.6.8=h0371630_0
+  - readline=7.0=h7b6447c_5
+  - setuptools=40.6.3=py36_0
+  - six=1.12.0=py36_0
+  - sqlite=3.26.0=h7b6447c_0
+  - tk=8.6.8=hbc83047_0
+  - wheel=0.32.3=py36_0
+  - xz=5.2.4=h14c3975_4
+  - zlib=1.2.11=h7b6447c_3
+  - pytorch=1.0.0
+  - cuda100
+  - torchvision=0.2.1=py_2
+  - pip:
+    - decorator==4.3.0
+    - flask==1.0.2
+    - flask-cors==3.0.7
+    - itsdangerous==1.1.0
+    - jinja2==2.10
+    - markupsafe==1.1.0
+    - music21==5.5.0
+    - torch==1.0.0
+    - tqdm==4.29.0
+    - werkzeug==0.14.1
+prefix: C:\Users\Tyan\anaconda3\envs\deepbach_pytorch
+
+

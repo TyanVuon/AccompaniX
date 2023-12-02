@@ -1,0 +1,1 @@
+Epoch	Training Loss	Training Accuracy	Validation Loss	Validation Accuracy

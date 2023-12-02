@@ -1,4 +1,4 @@
-"""
+""
 Metadata classes
 """
 import numpy as np

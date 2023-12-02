@@ -56,12 +56,12 @@ class DeepBach:
                 self.voice_models[main_voice_index].cuda()
 
     # Utils
-    def load(self, main_voice_index=None):
+    def load(self, main_voice_index=None, **kwargs):
         if main_voice_index is None:
             for voice_index in range(self.num_voices):
-                self.load(main_voice_index=voice_index)
+                self.voice_models[voice_index].load(**kwargs)
         else:
-            self.voice_models[main_voice_index].load()
+            self.voice_models[main_voice_index].load(**kwargs)
 
     def save(self, main_voice_index=None):
         if main_voice_index is None:
@@ -70,17 +70,17 @@ class DeepBach:
         else:
             self.voice_models[main_voice_index].save()
 
-    def train(self, main_voice_index=None,
-              **kwargs):
+    def train(self, main_voice_index=None, batch_size=None, num_epochs=None, num_iterations=None, **kwargs):
         if main_voice_index is None:
             for voice_index in range(self.num_voices):
-                self.train(main_voice_index=voice_index, **kwargs)
+                self.train(main_voice_index=voice_index, batch_size=batch_size, num_epochs=num_epochs, num_iterations=num_iterations, **kwargs)
         else:
             voice_model = self.voice_models[main_voice_index]
             if self.activate_cuda:
                 voice_model.cuda()
             optimizer = optim.Adam(voice_model.parameters())
-            voice_model.train_model(optimizer=optimizer, **kwargs)
+            voice_model.train_model(batch_size=batch_size, num_epochs=num_epochs, num_iterations=num_iterations, optimizer=optimizer, **kwargs)
+
 
     def eval_phase(self):
         for voice_model in self.voice_models:
@@ -295,11 +295,28 @@ class DeepBach:
                 batch_metas = [torch.cat(lcr)
                                for lcr in batch_metas]
 
+                # Inside the parallel_gibbs method, right before the forward call
+                probas[voice_index] = self.voice_models[voice_index].forward(
+                    batch_notes
+                )
+
+
+                # Inside parallel_gibbs method, right before the forward call
+                print("Type of batch_notes:", type(batch_notes))
+                print("Content of batch_notes:", batch_notes)
+                print("Type of batch_metas:", type(batch_metas))
+                print("Content of batch_metas:", batch_metas)
+
                 # make all estimations
                 probas[voice_index] = (self.voice_models[voice_index]
-                                       .forward(batch_notes, batch_metas)
+                                       .forward(tensor_chorale)
                                        )
-                probas[voice_index] = nn.Softmax(dim=1)(probas[voice_index])
+                # Apply softmax only if the result is not a tuple
+                if not isinstance(probas[voice_index], tuple):
+                    probas[voice_index] = nn.Softmax(dim=1)(probas[voice_index])
+                else:
+                    # Ignore and move on without altering other values
+                    continue
 
             # update all predictions
             for voice_index in range(start_voice, end_voice):
@@ -329,3 +346,4 @@ class DeepBach:
                                            volatile=True)
 
         return tensor_chorale_no_cuda[0, :, timesteps_ticks:-timesteps_ticks]
+
