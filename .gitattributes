@@ -8,3 +8,4 @@ bach_chorales filter=lfs diff=lfs merge=lfs -text
 'key'] filter=lfs diff=lfs merge=lfs -text
 8 filter=lfs diff=lfs merge=lfs -text
 4) filter=lfs diff=lfs merge=lfs -text
+resources/dataset_cache/tensor_datasets/ChoraleDataset([0],bach_chorales,['fermata',[[:space:]]'tick',[[:space:]]'key'],8,4) filter=lfs diff=lfs merge=lfs -text
