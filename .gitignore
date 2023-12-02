@@ -113,3 +113,5 @@ melody_extraction/
 !download_pretrained_data.sh
 DatasetManager/dataset_cache/
 models/
+resources/dataset_cache/tensor_datasets/ChoraleDataset([0],bach_chorales,['fermata', 'tick', 'key'],8,4)
+reousrces/
