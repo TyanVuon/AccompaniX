@@ -120,21 +120,37 @@ class MusicDataset(ABC):
     @property
     def tensor_dataset(self):
         """
-        Loads or computes TensorDataset
+        Force loads TensorDataset from a specified file path.
         :return: TensorDataset
         """
         if self._tensor_dataset is None:
-            if self.tensor_dataset_is_cached():
-                print(f'Loading TensorDataset for {self.__repr__()}')
-                self._tensor_dataset = torch.load(self.tensor_dataset_filepath)
-            else:
-                print(f'Creating {self.__repr__()} TensorDataset'
-                      f' since it is not cached')
-                self._tensor_dataset = self.make_tensor_dataset()
-                torch.save(self._tensor_dataset, self.tensor_dataset_filepath)
-                print(f'TensorDataset for {self.__repr__()} '
-                      f'saved in {self.tensor_dataset_filepath}')
+            try:
+                # Specify the full path to your tensor dataset file
+                tensor_dataset_path = "C:\\Users\\Tyan\\Desktop\\life\\pretrained data deeepbaccchh\\resources\\dataset_cache\\tensor_datasets\\ChoraleDataset([0],bach_chorales,['fermata', 'tick', 'key'],8,4)"
+                print(f'Attempting to force load TensorDataset from {tensor_dataset_path}')
+                self._tensor_dataset = torch.load(tensor_dataset_path)
+                print('TensorDataset force loaded successfully.')
+            except Exception as e:
+                print(f'Failed to force load TensorDataset: {e}')
         return self._tensor_dataset
+
+    # def tensor_dataset(self):
+    #     """
+    #     Loads or computes TensorDataset
+    #     :return: TensorDataset
+    #     """
+    #     if self._tensor_dataset is None:
+    #         if self.tensor_dataset_is_cached():
+    #             print(f'Loading TensorDataset for {self.__repr__()}')
+    #             self._tensor_dataset = torch.load(self.tensor_dataset_filepath)
+    #         else:
+    #             print(f'Creating {self.__repr__()} TensorDataset'
+    #                   f' since it is not cached')
+    #             self._tensor_dataset = self.make_tensor_dataset()
+    #             torch.save(self._tensor_dataset, self.tensor_dataset_filepath)
+    #             print(f'TensorDataset for {self.__repr__()} '
+    #                   f'saved in {self.tensor_dataset_filepath}')
+    #     return self._tensor_dataset
 
     @tensor_dataset.setter
     def tensor_dataset(self, value):

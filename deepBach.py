@@ -91,24 +91,44 @@ def main(note_embedding_dim,
     )
 
     # Inside main() function
-    if train:
-        ## Load weights if provided
-        if weights_paths:
-            weights_paths_list = weights_paths.split(',')
-            if len(weights_paths_list) != 4:
-                raise ValueError("Expected 4 weight files for the 4 voice models")
-            for i, weight_path in enumerate(weights_paths_list):
-                deepbach.voice_models[i].load_state_dict(torch.load(weight_path))
-                print(f"Loaded weights for voice {i} from {weight_path}")
-
-        deepbach.train(batch_size=batch_size, num_epochs=num_epochs)
-    elif load:
-        if num_iterations == 'None':
-            num_iterations = None
-        else:
-            num_iterations = int(num_iterations)
-        deepbach.load(batch_size=batch_size, num_epochs=num_epochs, num_iterations=num_iterations, timestamp=timestamp)
+    if load:
+        # Load pre-trained models
+        model_filenames = [
+            'C:\\Users\\Tyan\\Oct19thDeepBach\\DeepBachTyan\\models\\VoiceModel_bs256_ep5_it500_0.pt',
+            'C:\\Users\\Tyan\\Oct19thDeepBach\\DeepBachTyan\\models\\VoiceModel_bs256_ep5_it500_1.pt',
+            'C:\\Users\\Tyan\\Oct19thDeepBach\\DeepBachTyan\\models\\VoiceModel_bs256_ep5_it500_2.pt',
+            'C:\\Users\\Tyan\\Oct19thDeepBach\\DeepBachTyan\\models\\VoiceModel_bs256_ep5_it500_3.pt'
+        ]
+        deepbach.load(model_filenames)
         deepbach.cuda()
+        print("Pre-trained models loaded.")
+
+    if train:
+        # Perform minimal training
+        deepbach.train(batch_size=1024, num_epochs=1)  # Adjust batch_size as needed
+        print("Minimal training completed.")
+
+    # if train:
+    #     ## Load weights if provided
+    #     if weights_paths:
+    #         weights_paths_list = weights_paths.split(',')
+    #         if len(weights_paths_list) != 4:
+    #             raise ValueError("Expected 4 weight files for the 4 voice models")
+    #         for i, weight_path in enumerate(weights_paths_list):
+    #             deepbach.voice_models[i].load_state_dict(torch.load(weight_path))
+    #             print(f"Loaded weights for voice {i} from {weight_path}")
+    #
+    #     deepbach.train(batch_size=batch_size, num_epochs=num_epochs)
+    # elif load:
+    #     # Specify the full paths to your model files
+    #     model_filenames = [
+    #         'C:\\Users\\Tyan\\Oct19thDeepBach\\DeepBachTyan\\models\\VoiceModel_bs256_ep5_it500_0.pt',
+    #         'C:\\Users\\Tyan\\Oct19thDeepBach\\DeepBachTyan\\models\\VoiceModel_bs256_ep5_it500_1.pt',
+    #         'C:\\Users\\Tyan\\Oct19thDeepBach\\DeepBachTyan\\models\\VoiceModel_bs256_ep5_it500_2.pt',
+    #         'C:\\Users\\Tyan\\Oct19thDeepBach\\DeepBachTyan\\models\\VoiceModel_bs256_ep5_it500_3.pt'
+    #     ]
+    #     deepbach.load(model_filenames)
+    #     deepbach.cuda()
 
     print('Generation')
     if weights_paths:

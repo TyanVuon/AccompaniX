@@ -18,6 +18,14 @@ from DeepBach.data_utils import reverse_tensor, mask_entry
 
 MAIN_VOICE_INDEX = 1  # Replace 0 with your desired index
 
+# Initialization of metadata values
+metadata_values = {
+    'IsPlayingMetadata': 2,  # as defined in IsPlayingMetadata
+    ##'TickMetadata': subdivision,  # subdivision value as defined in your model
+    'ModeMetadata': 3,  # as defined in ModeMetadata
+    'KeyMetadata': 16,  # as defined in KeyMetadata
+    'FermataMetadata': 2  # as defined in FermataMetadata
+}
 class VoiceModel(nn.Module):
     def __init__(self,
                  dataset: ChoraleDataset,
@@ -98,6 +106,8 @@ class VoiceModel(nn.Module):
             print('Training on CPU')
         self.device = device
         self.to(self.device)
+        # Initialize num_metadata_values
+        self.num_metadata_values = sum(metadata_values.values())
         # 添加 cache_names 属性
         self.cache_names = ['m3cache', 'm2cache', 'm1cache', 'm05cache', 'p05cache', 'p1cache', 'p2cache', 'p3cache']
         print("Note embeddings initialized.")
@@ -116,45 +126,29 @@ class VoiceModel(nn.Module):
         label = (batch_size)
         right_notes and right_metas are REVERSED (from right to left)
         """
-        ##print(f'tensor_chorale shape: {tensor_chorale.shape}')
-        ##print(f'tensor_metadata shape: {tensor_metadata.shape}')
         batch_size, num_voices, chorale_length_ticks = tensor_chorale.size()
 
         # random shift! Depends on the dataset
         offset = random.randint(0, self.dataset.subdivision)
         time_index_ticks = chorale_length_ticks // 2 + offset
 
-        # Generate pitch difference labels for the main voice
-        pitch_diff_labels = self.extract_pitch_differences_from_tensor(tensor_chorale[:, self.main_voice_index, :])
-
-        # Cache tenor voice pitch differences for use in training
-        tenor_voice_tensor = tensor_chorale[self.main_voice_index, :]
-        tenor_diffs = self.extract_pitch_differences_from_tensor(tenor_voice_tensor)
-        self.update_cache(tenor_diffs)
-
         # split notes
         notes, label = self.preprocess_notes(tensor_chorale, time_index_ticks)
         metas = self.preprocess_metas(tensor_metadata, time_index_ticks)
-        # In the preprocess_input method, after calling preprocess_notes and preprocess_metas
-        ##print(f'Notes shape after preprocessing: {notes[0].shape}, {notes[1].shape}, {notes[2].shape}')
-        ##print(f'Metas shape after preprocessing: {metas[0].shape}, {metas[1].shape}, {metas[2].shape}')
-
-        # Initialize total_loss as None, it will be calculated later in the training loop
-        total_loss = None
-
-        return notes, metas, label, pitch_diff_labels
+        return notes, metas, label
 
     def preprocess_notes(self, tensor_chorale, time_index_ticks):
         """
+
         :param tensor_chorale: (batch_size, num_voices, chorale_length_ticks)
         :param time_index_ticks:
         :return:
         """
         batch_size, num_voices, _ = tensor_chorale.size()
-        left_notes = tensor_chorale[:, :, :time_index_ticks].transpose(1, 2)
+        left_notes = tensor_chorale[:, :, :time_index_ticks]
         right_notes = reverse_tensor(
             tensor_chorale[:, :, time_index_ticks + 1:],
-            dim=2).transpose(1, 2)
+            dim=2)
         if self.num_voices == 1:
             central_notes = None
         else:
@@ -162,10 +156,6 @@ class VoiceModel(nn.Module):
                                        entry_index=self.main_voice_index,
                                        dim=1)
         label = tensor_chorale[:, self.main_voice_index, time_index_ticks]
-        ##print(f'Left notes shape: {left_notes.shape}')
-        ##print(f'Right notes shape: {right_notes.shape}')
-        ##print(f'Central notes shape: {central_notes.shape if central_notes is not None else "NA"}')
-
         return (left_notes, central_notes, right_notes), label
 
     def preprocess_metas(self, tensor_metadata, time_index_ticks):
@@ -181,11 +171,92 @@ class VoiceModel(nn.Module):
             tensor_metadata[:, self.main_voice_index, time_index_ticks + 1:, :],
             dim=1)
         central_metas = tensor_metadata[:, self.main_voice_index, time_index_ticks, :]
-        ##print(f'Left metas shape: {left_metas.shape}')
-        ##print(f'Right metas shape: {right_metas.shape}')
-        ##print(f'Central metas shape: {central_metas.shape}')
-
         return left_metas, central_metas, right_metas
+    # def preprocess_input(self, tensor_chorale, tensor_metadata):
+    #     """
+    #     :param tensor_chorale: (batch_size, num_voices, chorale_length_ticks)
+    #     :param tensor_metadata: (batch_size, num_metadata, chorale_length_ticks)
+    #     :return: (notes, metas, label) tuple
+    #     where
+    #     notes = (left_notes, central_notes, right_notes)
+    #     metas = (left_metas, central_metas, right_metas)
+    #     label = (batch_size)
+    #     right_notes and right_metas are REVERSED (from right to left)
+    #     """
+    #     ##print(f'tensor_chorale shape: {tensor_chorale.shape}')
+    #     ##print(f'tensor_metadata shape: {tensor_metadata.shape}')
+    #     batch_size, num_voices, chorale_length_ticks = tensor_chorale.size()
+    #
+    #     # random shift! Depends on the dataset
+    #     offset = random.randint(0, self.dataset.subdivision)
+    #     time_index_ticks = chorale_length_ticks // 2 + offset
+    #
+    #     # Generate pitch difference labels for the main voice
+    #     pitch_diff_labels = self.extract_pitch_differences_from_tensor(tensor_chorale[:, self.main_voice_index, :])
+    #
+    #     # Cache tenor voice pitch differences for use in training
+    #     tenor_voice_tensor = tensor_chorale[self.main_voice_index, :]
+    #     tenor_diffs = self.extract_pitch_differences_from_tensor(tenor_voice_tensor)
+    #     self.update_cache(tenor_diffs)
+    #
+    #     # split notes
+    #     notes, label = self.preprocess_notes(tensor_chorale, time_index_ticks)
+    #     metas = self.preprocess_metas(tensor_metadata, time_index_ticks)
+    #     # In the preprocess_input method, after calling preprocess_notes and preprocess_metas
+    #     ##print(f'Notes shape after preprocessing: {notes[0].shape}, {notes[1].shape}, {notes[2].shape}')
+    #     ##print(f'Metas shape after preprocessing: {metas[0].shape}, {metas[1].shape}, {metas[2].shape}')
+    #
+    #     # Initialize total_loss as None, it will be calculated later in the training loop
+    #     total_loss = None
+    #
+    #     return notes, metas ##label, pitch_diff_labels
+    #     ##pitch_diff_labels may be used for training and labeling.
+    #     ##notes and metas are the primary processed data for your model.
+    #
+    #
+    # def preprocess_notes(self, tensor_chorale, time_index_ticks):
+    #     """
+    #     :param tensor_chorale: (batch_size, num_voices, chorale_length_ticks)
+    #     :param time_index_ticks:
+    #     :return:
+    #     """
+    #     batch_size, num_voices, _ = tensor_chorale.size()
+    #     left_notes = tensor_chorale[:, :, :time_index_ticks].transpose(1, 2)
+    #     right_notes = reverse_tensor(
+    #         tensor_chorale[:, :, time_index_ticks + 1:],
+    #         dim=2).transpose(1, 2)
+    #     if self.num_voices == 1:
+    #         central_notes = None
+    #     else:
+    #         central_notes = mask_entry(tensor_chorale[:, :, time_index_ticks],
+    #                                    entry_index=self.main_voice_index,
+    #                                    dim=1)
+    #     label = tensor_chorale[:, self.main_voice_index, time_index_ticks]
+    #     ##print(f'Left notes shape: {left_notes.shape}')
+    #     ##print(f'Right notes shape: {right_notes.shape}')
+    #     ##print(f'Central notes shape: {central_notes.shape if central_notes is not None else "NA"}')
+    #
+    #     return (left_notes, central_notes, right_notes), label
+    # ## label in here likely represents some target or ground truth for your model related to the main voice.
+    #
+    # def preprocess_metas(self, tensor_metadata, time_index_ticks):
+    #     """
+    #
+    #     :param tensor_metadata: (batch_size, num_voices, chorale_length_ticks)
+    #     :param time_index_ticks:
+    #     :return:
+    #     """
+    #
+    #     left_metas = tensor_metadata[:, self.main_voice_index, :time_index_ticks, :]
+    #     right_metas = reverse_tensor(
+    #         tensor_metadata[:, self.main_voice_index, time_index_ticks + 1:, :],
+    #         dim=1)
+    #     central_metas = tensor_metadata[:, self.main_voice_index, time_index_ticks, :]
+    #     ##print(f'Left metas shape: {left_metas.shape}')
+    #     ##print(f'Right metas shape: {right_metas.shape}')
+    #     ##print(f'Central metas shape: {central_metas.shape}')
+    #
+    #     return left_metas, central_metas, right_metas
 
      ## Embedding method
     def embed(self, notes_or_metas, type):
@@ -202,65 +273,161 @@ class VoiceModel(nn.Module):
 
         # Handling left and right embeddings
         left_embedded = torch.cat([embeddings[voice_id](left[:, :, voice_id])[:, :, None, :]
-                                   for voice_id in range(len(embeddings))], 2)
+                                   for voice_id in range(left.size(2))], 2)
         right_embedded = torch.cat([embeddings[voice_id](right[:, :, voice_id])[:, :, None, :]
-                                    for voice_id in range(len(embeddings))], 2)
+                                    for voice_id in range(right.size(2))], 2)
 
         # Reshaping embedded tensors
-        left_embedded = left_embedded.view(left_embedded.shape[0], -1, embedding_dim * len(embeddings))
-        right_embedded = right_embedded.view(right_embedded.shape[0], -1, embedding_dim * len(embeddings))
+        left_embedded = left_embedded.view(left_embedded.shape[0], -1, embedding_dim * left.size(2))
+        right_embedded = right_embedded.view(right_embedded.shape[0], -1, embedding_dim * right.size(2))
 
         # Handling center embeddings
-        if center is not None:
+        if center is not None and center.size(1) > 0:
             center_embedded = torch.cat([embeddings[voice_id](center[:, k].unsqueeze(1))
-                                         for k, voice_id in enumerate(other_voices_indexes)], 1)
+                                         for k, voice_id in enumerate(other_voices_indexes)
+                                         if k < center.size(1)], 1)
             center_embedded = center_embedded.view(center.shape[0], 1, -1)
         else:
-            center_embedded = None
+            # Assign a default value (e.g., zeros) if center is empty or not properly sized
+            default_dim = len(other_voices_indexes) * embedding_dim
+            center_embedded = torch.zeros(left.size(0), 1, default_dim).to(left.device)
 
         return left_embedded, center_embedded, right_embedded
 
+    # def one_hot_encode(self, tensor, num_categories):
+    #     """
+    #     One-hot encode the input tensor.
+    #     :param tensor: A batch of notes or metadata.
+    #     :param num_categories: Total number of distinct categories (notes or metadata values).
+    #     :return: One-hot encoded tensor.
+    #     """
+    #     batch_size, sequence_length = tensor.size()[:2]
+    #     one_hot = torch.zeros(batch_size, sequence_length, num_categories).to(self.device)
+    #
+    #     # Reshape tensor to match the dimensions for scatter
+    #     tensor = tensor.view(batch_size, sequence_length, -1)
+    #     one_hot.scatter_(2, tensor, 1)
+    #     return one_hot.view(batch_size, sequence_length, -1)
+    #
+    # def embed(self, input_tensor, type):
+    #     """
+    #     Embed input tensor using one-hot encoding.
+    #     """
+    #     left, center, right = input_tensor
+    #
+    #     if type == 'note':
+    #         num_categories = max(self.num_notes_per_voice)
+    #     elif type == 'meta':
+    #         num_categories = self.num_metadata_values
+    #
+    #     left_embedded = self.one_hot_encode(left, num_categories) if left is not None else None
+    #     center_embedded = self.one_hot_encode(center, num_categories) if center is not None else None
+    #     right_embedded = self.one_hot_encode(right, num_categories) if right is not None else None
+    #
+    #     return left_embedded, center_embedded, right_embedded
+
     ## Forward pass method
 
-    def forward(self, input, tensor_chorale=None):
-        print("Input Length:", len(input))
-        print("Notes shape:", input[0][0].shape)
-        print("Metas shape:", input[1][0].shape)
+    def forward(self, *input):
+        notes, metas = input
+        batch_size, num_voices, timesteps_ticks = notes[0].size()
 
-        notes, metas = input[0], input[1]
-        batch_size = notes[0].shape[0]
+        # put time first
+        ln, cn, rn = notes
+        ln, rn = [t.transpose(1, 2) for t in (ln, rn)]
+        notes = ln, cn, rn
 
-        # Embedding
+        # embedding
         notes_embedded = self.embed(notes, type='note')
         metas_embedded = self.embed(metas, type='meta')
 
-        # Extracting embedded notes
-        left_embedded, center_embedded, right_embedded = notes_embedded
+        # lists of (N, timesteps_ticks, voices * dim_embedding)
+        # where timesteps_ticks is 1 for central parts
 
-        # Concatenating notes and metas
+        # concat notes and metas
         input_embedded = [torch.cat([notes, metas], 2) if notes is not None else None
                           for notes, metas in zip(notes_embedded, metas_embedded)]
 
-        # Processing each segment: left, center, and right
         left, center, right = input_embedded
-        hidden = init_hidden(num_layers=self.num_layers, batch_size=batch_size, lstm_hidden_size=self.lstm_hidden_size)
-        left, _ = self.lstm_left(left, hidden)
+
+        # main part
+        hidden = init_hidden(
+            num_layers=self.num_layers,
+            batch_size=batch_size,
+            lstm_hidden_size=self.lstm_hidden_size,
+        )
+        left, hidden = self.lstm_left(left, hidden)
         left = left[:, -1, :]
 
-        if center is not None:
-            center = self.mlp_center(center[:, 0, :])
+        if self.num_voices == 1:
+            center = cuda_variable(torch.zeros(
+                batch_size,
+                self.lstm_hidden_size)
+            )
         else:
-            center = cuda_variable(torch.zeros(batch_size, self.lstm_hidden_size))
+            center = center[:, 0, :]  # remove time dimension
+            center = self.mlp_center(center)
 
-        right, _ = self.lstm_right(right, hidden)
+        hidden = init_hidden(
+            num_layers=self.num_layers,
+            batch_size=batch_size,
+            lstm_hidden_size=self.lstm_hidden_size,
+        )
+        right, hidden = self.lstm_right(right, hidden)
         right = right[:, -1, :]
 
-        # Concatenating the results
-        concatenated = torch.cat([left, center, right], 1)
+        # concat and return prediction
+        predictions = torch.cat([
+            left, center, right
+        ], 1)
 
-        predictions = self.mlp_predictions(concatenated)
+        predictions = self.mlp_predictions(predictions)
+
+        # Check for new features or parameters
+        if hasattr(self, 'new_feature'):
+            # Adjust the forward pass to handle new features
+            # Example: predictions = self.handle_new_feature(predictions)
+            pass  # Replace with actual handling code
 
         return predictions
+
+    # def forward(self, *input):
+    #     notes, metas = input
+    #     batch_size = notes[0].shape[0]
+    #
+    #     # Embedding
+    #     notes_embedded = self.embed(notes, type='note')
+    #     metas_embedded = self.embed(metas, type='meta')
+    #
+    #     # Padding and concatenating
+    #     input_embedded = []
+    #     for note, meta in zip(notes_embedded, metas_embedded):
+    #         seq_len = max(note.shape[1], meta.shape[1])
+    #
+    #         if note is not None:
+    #             # Pad notes and metas if needed
+    #             note = F.pad(note, (0, 0, 0, seq_len - note.shape[1])) if note.shape[1] < seq_len else note
+    #             meta = F.pad(meta, (0, 0, 0, seq_len - meta.shape[1])) if meta.shape[1] < seq_len else meta
+    #             input_embedded.append(torch.cat([note, meta], 2))
+    #
+    #     # Process each segment: left, center, and right
+    #     left, center, right = input_embedded
+    #     hidden = init_hidden(num_layers=self.num_layers, batch_size=batch_size, lstm_hidden_size=self.lstm_hidden_size)
+    #     left, _ = self.lstm_left(left, hidden)
+    #     left = left[:, -1, :]
+    #
+    #     if center is not None:
+    #         center = self.mlp_center(center[:, 0, :])
+    #     else:
+    #         center = cuda_variable(torch.zeros(batch_size, self.lstm_hidden_size))
+    #
+    #     right, _ = self.lstm_right(right, hidden)
+    #     right = right[:, -1, :]
+    #
+    #     # Concatenate the results
+    #     concatenated = torch.cat([left, center, right], 1)
+    #     predictions = self.mlp_predictions(concatenated)
+    #     return predictions
 
     def extract_pitch_differences_from_tensor(self, tensor_voice):
         """
@@ -449,7 +616,8 @@ class VoiceModel(nn.Module):
                 tensor_metadata = cuda_variable(tensor_metadata).long()
 
                 # Get processed inputs
-                notes, metas, label, pitch_diff_labels = self.preprocess_input(tensor_chorale, tensor_metadata)
+                notes, metas, label = self.preprocess_input(tensor_chorale, tensor_metadata)
+                ##notes, metas, label, pitch_diff_labels = self.preprocess_input(tensor_chorale, tensor_metadata)
 
                 # Forward pass
                 predictions = self.forward(notes, metas)
@@ -522,7 +690,7 @@ class VoiceModel(nn.Module):
             # Forward pass
             predictions = self.forward(notes, metas)
             # In the train_model method, after getting predictions from the forward pass
-            print(f'Predictions shape: {predictions.shape}')
+            #print(f'Predictions shape: {predictions.shape}')
 
             # Calculate the total loss
             total_loss = self.modified_loss_function(predictions, label, pitch_diff_labels)
@@ -550,25 +718,36 @@ class VoiceModel(nn.Module):
         torch.save(self.state_dict(), filename)
         print(f'Model saved as {filename}')
 
-    def load(self, batch_size=None, num_epochs=None, num_iterations=None, timestamp=None):
-        model_directory = 'models'
-        matched_files = []
-        # Iterate over all files in the model directory
-        for filename in os.listdir(model_directory):
-            if filename.startswith('VoiceModel'):
-                match = True
-                if batch_size and f'bs{batch_size}' not in filename:
-                    match = False
-                if num_epochs and f'ep{num_epochs}' not in filename:
-                    match = False
-                if num_iterations:
-                    if f'it{num_iterations}' not in filename and 'itNone' not in filename:
-                        match = False
-                if timestamp and timestamp not in filename:
-                    match = False
+    def load(self, model_filename):
+        model_directory = 'C:\\Users\\Tyan\\Oct19thDeepBach\\DeepBachTyan\\models'
+        filepath = os.path.join(model_directory, model_filename)
 
-                if match:
-                    matched_files.append(filename)
+        if os.path.exists(filepath):
+            state_dict = torch.load(filepath, map_location=lambda storage, loc: storage)
+            self.load_state_dict(state_dict, strict=False)
+            print(f'Model loaded from {filepath}')
+        else:
+            print(f'No model file found at {filepath}')
+    # def load(self, batch_size=None, num_epochs=None, num_iterations=None, timestamp=None):
+    #     model_directory = 'models'
+    #     matched_files = []
+    #     # Iterate over all files in the model directory
+    #     for filename in os.listdir(model_directory):
+    #         print(f"checking file:{filename}")
+    #         if filename.startswith('VoiceModel'):
+    #             match = True
+    #             if batch_size and f'bs{batch_size}' not in filename:
+    #                 match = False
+    #             if num_epochs and f'ep{num_epochs}' not in filename:
+    #                 match = False
+    #             if num_iterations:
+    #                 if f'it{num_iterations}' not in filename and 'itNone' not in filename:
+    #                     match = False
+    #             if timestamp and timestamp not in filename:
+    #                 match = False
+    #
+    #             if match:
+    #                 matched_files.append(filename)
 
         if matched_files:
             # Load the first matched file

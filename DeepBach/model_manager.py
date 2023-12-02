@@ -56,12 +56,21 @@ class DeepBach:
                 self.voice_models[main_voice_index].cuda()
 
     # Utils
-    def load(self, main_voice_index=None, **kwargs):
-        if main_voice_index is None:
-            for voice_index in range(self.num_voices):
-                self.voice_models[voice_index].load(**kwargs)
-        else:
-            self.voice_models[main_voice_index].load(**kwargs)
+    def load(self, model_filenames):
+        if len(model_filenames) != len(self.voice_models):
+            raise ValueError("Number of model filenames does not match the number of voice models")
+
+        for model, filename in zip(self.voice_models, model_filenames):
+            state_dict = torch.load(filename)
+            model.load_state_dict(state_dict)
+            print(f"Model loaded from {filename}")
+
+    # def load(self, main_voice_index=None, **kwargs):
+    #     if main_voice_index is None:
+    #         for voice_index in range(self.num_voices):
+    #             self.voice_models[voice_index].load(**kwargs)
+    #     else:
+    #         self.voice_models[main_voice_index].load(**kwargs)
 
     def save(self, main_voice_index=None):
         if main_voice_index is None:
@@ -289,28 +298,15 @@ class DeepBach:
 
                 # reshape batches
                 batch_notes = list(map(list, zip(*batch_notes)))
-                batch_notes = [torch.cat(lcr) if lcr[0] is not None else None
-                               for lcr in batch_notes]
+                batch_notes = [torch.cat(lcr) if lcr[0] is not None else None for lcr in batch_notes]
                 batch_metas = list(map(list, zip(*batch_metas)))
-                batch_metas = [torch.cat(lcr)
-                               for lcr in batch_metas]
+                batch_metas = [torch.cat(lcr) for lcr in batch_metas]
 
-                # Inside the parallel_gibbs method, right before the forward call
-                probas[voice_index] = self.voice_models[voice_index].forward(
-                    batch_notes
-                )
+                # Forward pass
+                probas[voice_index] = self.voice_models[voice_index].forward(batch_notes, batch_metas)
 
 
-                # Inside parallel_gibbs method, right before the forward call
-                print("Type of batch_notes:", type(batch_notes))
-                print("Content of batch_notes:", batch_notes)
-                print("Type of batch_metas:", type(batch_metas))
-                print("Content of batch_metas:", batch_metas)
 
-                # make all estimations
-                probas[voice_index] = (self.voice_models[voice_index]
-                                       .forward(tensor_chorale)
-                                       )
                 # Apply softmax only if the result is not a tuple
                 if not isinstance(probas[voice_index], tuple):
                     probas[voice_index] = nn.Softmax(dim=1)(probas[voice_index])
