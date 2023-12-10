@@ -1,21 +1,17 @@
 """
 @author: Gaetan Hadjeres
 """
-import os
-
-os.environ['CUDA_HOME'] = 'C:\\Users\\Tyan\\MayBach\\cuda and cudnn lib\\cuda'
-os.environ['PATH'] = os.environ['PATH'] + ';C:\\Users\\Tyan\\MayBach\\cuda and cudnn lib\\cuda\\bin'
-os.environ['CUDNN_HOME'] = 'C:\\Users\\Tyan\\MayBach\\cuda and cudnn lib\\cudnn'
-os.environ['PATH'] = os.environ['PATH'] + ';C:\\Users\\Tyan\\MayBach\\cuda and cudnn lib\\cudnn\\bin'
 
 from DatasetManager.metadata import FermataMetadata
 import numpy as np
 import torch
 from DeepBach.helpers import cuda_variable, to_numpy
-
+import glob
+import os
 from torch import optim, nn
 from tqdm import tqdm
-
+import time
+import datetime
 from DeepBach.voice_model import VoiceModel
 
 
@@ -28,11 +24,16 @@ class DeepBach:
                  lstm_hidden_size,
                  dropout_lstm,
                  linear_hidden_size,
+                 num_epochs,
+                 batch_size
                  ):
         self.dataset = dataset
         self.num_voices = self.dataset.num_voices
         self.num_metas = len(self.dataset.metadatas) + 1
         self.activate_cuda = torch.cuda.is_available()
+        # Ensure that metadata_values is initialized in the dataset
+        if not hasattr(self.dataset, 'metadata_values'):
+            self.dataset.initialize_metadata_values(self.dataset.metadatas, self.dataset.subdivision)
 
         self.voice_models = [VoiceModel(
             dataset=self.dataset,
@@ -42,7 +43,10 @@ class DeepBach:
             num_layers=num_layers,
             lstm_hidden_size=lstm_hidden_size,
             dropout_lstm=dropout_lstm,
+            num_epochs=num_epochs,
             hidden_size_linear=linear_hidden_size,
+            batch_size=batch_size,
+            metadata_values=self.dataset.metadata_values
         )
             for main_voice_index in range(self.num_voices)
         ]
@@ -55,41 +59,178 @@ class DeepBach:
             else:
                 self.voice_models[main_voice_index].cuda()
 
+    def extract_params_from_filename(self, filename, exclude_voice_id=False):
+        """
+        Extract configuration parameters from the model filename.
+        Optionally exclude voice id parameter based on the exclude_voice_id flag.
+        """
+        # Separate base name from extension
+        base_name, _ = os.path.splitext(filename)
+        parts = base_name.split('_')
+        params = {}
+        for part in parts:
+            if exclude_voice_id and part.startswith('vi'):
+                continue  # Skip voice index part if exclude_voice_id is True
+            if part.startswith('ned'):
+                params['note_embedding_dim'] = int(part[3:].split('.')[0])
+            elif part.startswith('med'):
+                params['meta_embedding_dim'] = int(part[3:].split('.')[0])
+            elif part.startswith('nl'):
+                params['num_layers'] = int(part[2:].split('.')[0])
+            elif part.startswith('lhs'):
+                params['lstm_hidden_size'] = int(part[3:].split('.')[0])
+            elif part.startswith('dl'):
+                params['dropout_lstm'] = float(part[2:].split('.')[0])
+            elif part.startswith('lh'):
+                params['linear_hidden_size'] = int(part[2:].split('.')[0])
+        return params
+
+    def configure_voice_models(self, note_embedding_dim=None, meta_embedding_dim=None, num_layers=None, lstm_hidden_size=None, dropout_lstm=None, linear_hidden_size=None,num_epochs=None):
+        """
+        Dynamically configure the voice models architecture based on the given parameters.
+        """
+        # Print existing architecture
+        print("Current architecture before configuration:")
+        for i, model in enumerate(self.voice_models):
+            print(f"Voice model {i} architecture: {model}")
+
+        # Use provided values or set default values based on click.options
+        num_epochs = num_epochs if num_epochs is not None else 5  # Set a default value for num_epochs
+        note_embedding_dim = note_embedding_dim if note_embedding_dim is not None else 20  # Default from click.option
+        meta_embedding_dim = meta_embedding_dim if meta_embedding_dim is not None else 20  # Default from click.option
+        num_layers = num_layers if num_layers is not None else 2  # Default from click.option
+        lstm_hidden_size = lstm_hidden_size if lstm_hidden_size is not None else 256 # Default from click.option
+        dropout_lstm = dropout_lstm if dropout_lstm is not None else 0.5  # Default from click.option
+        linear_hidden_size = linear_hidden_size if linear_hidden_size is not None else 256  # Default from click.option
+
+        # Create new voice models with the configured parameters
+        self.voice_models = [VoiceModel(
+            dataset=self.dataset,
+            main_voice_index=voice_index,
+            note_embedding_dim=note_embedding_dim,
+            meta_embedding_dim=meta_embedding_dim,
+            num_layers=num_layers,
+            lstm_hidden_size=lstm_hidden_size,
+            dropout_lstm=dropout_lstm,
+            hidden_size_linear=linear_hidden_size,
+            num_epochs=num_epochs
+        ) for voice_index in range(self.num_voices)]
+        # Print new architecture
+        print("New architecture after configuration:")
+        for i, model in enumerate(self.voice_models):
+            print(f"Voice model {i} architecture: {model}")
+
+
+    def extract_voice_index(self, filename):
+        # Split the filename and find the part that starts with 'vi'
+        parts = filename.split('_')
+        for part in parts:
+            if part.startswith('vi'):
+                # Extract the voice index number and return it as an integer
+                return int(part[2:])
+        # Return a default value (like 0) if no voice index is found
+        return 0
+
     # Utils
-    def load(self, model_filenames):
-        if len(model_filenames) != len(self.voice_models):
-            raise ValueError("Number of model filenames does not match the number of voice models")
+    def load_models(self, search_params=None):
+        if search_params:
+            # Dynamic loading based on search_params
+            pattern = "model_*"
+            for param, value in search_params.items():
+                if 'vi' not in param:  # Exclude voice id from the search pattern
+                    pattern += f"_{param}{value}"
+            pattern += "*.pt"
 
-        for model, filename in zip(self.voice_models, model_filenames):
-            state_dict = torch.load(filename)
-            model.load_state_dict(state_dict)
-            print(f"Model loaded from {filename}")
+            matching_files = glob.glob(os.path.join('models', pattern))
+            sets = {}
+            for file in matching_files:
+                params = self.extract_params_from_filename(file, exclude_voice_id=True)
+                set_identifier = '_'.join([f"{param}{value}" for param, value in params.items()])
+                sets.setdefault(set_identifier, []).append(file)
 
-    # def load(self, main_voice_index=None, **kwargs):
+            if sets:
+                for set_id, files in sets.items():
+                    print(f"Matching files for set {set_id}: {files}")
+                    for voice_index in range(self.num_voices):  # Load for each voice
+                        voice_files = [f for f in files if f'vi{voice_index}' in f]
+                        if not voice_files:  # Handle case where no voice_id in filename
+                            voice_files = files  # Use the same files for each voice
+
+                        if voice_files:
+                            file_to_load = voice_files[0]  # Load the first matching file
+                            print(f"Loading file for voice {voice_index}: {file_to_load}")
+                            params = self.extract_params_from_filename(file_to_load)
+                            self.configure_voice_models(**params)
+                            state_dict = torch.load(file_to_load)
+                            model_state_dict_keys = set(self.voice_models[voice_index].state_dict().keys())
+                            loaded_state_dict_keys = set(state_dict.keys())
+                            if model_state_dict_keys.issubset(loaded_state_dict_keys):
+                                print(f"Model for voice {voice_index} loaded correctly.")
+                                self.voice_models[voice_index].load_state_dict(state_dict)
+                            else:
+                                print(
+                                    f"Model for voice {voice_index} did not load correctly. Mismatch in state dict keys.")
+                                print("Model's state dict keys:", model_state_dict_keys)
+                                print("Loaded state dict keys:", loaded_state_dict_keys)
+                        else:
+                            print(f"No files found for voice {voice_index}.")
+            else:
+                print("No matching models found.")
+        else:
+            # Load default models
+            model_files = sorted(glob.glob('models/*.pt'))  # List and sort all .pt files in models folder
+            if len(model_files) < self.num_voices:
+                print(
+                    f"Not enough model files found in 'models/' directory. Expected {self.num_voices}, found {len(model_files)}.")
+                return
+            for voice_index in range(self.num_voices):
+                model_file = model_files[voice_index]
+                print(f"Loading model from file: {model_file}")
+                state_dict = torch.load(model_file)
+                self.voice_models[voice_index].load_state_dict(state_dict)
+
+    # # Example usage:
+# search_params = {'ep': 1, 'ni': 1, 'ned': 20}  # Add more parameters as needed
+# deepbach_model = DeepBach(...)
+# deepbach_model.load_models(search_params=search_params)
+
+    def save(self, main_voice_index=None, details=None):
+        if main_voice_index is None:
+            for voice_index in range(self.num_voices):
+                self.save(main_voice_index=voice_index, details=details)
+        else:
+            self.voice_models[main_voice_index].save(details)
+
+
+    # def save(self, main_voice_index=None):
     #     if main_voice_index is None:
     #         for voice_index in range(self.num_voices):
-    #             self.voice_models[voice_index].load(**kwargs)
+    #             self.save(main_voice_index=voice_index)
     #     else:
-    #         self.voice_models[main_voice_index].load(**kwargs)
+    #         self.voice_models[main_voice_index].save()
 
-    def save(self, main_voice_index=None):
-        if main_voice_index is None:
-            for voice_index in range(self.num_voices):
-                self.save(main_voice_index=voice_index)
-        else:
-            self.voice_models[main_voice_index].save()
+    def train(self, batch_size, num_epochs, details=None):
+        """
+        Train each voice model.
 
-    def train(self, main_voice_index=None, batch_size=None, num_epochs=None, num_iterations=None, **kwargs):
-        if main_voice_index is None:
-            for voice_index in range(self.num_voices):
-                self.train(main_voice_index=voice_index, batch_size=batch_size, num_epochs=num_epochs, num_iterations=num_iterations, **kwargs)
-        else:
-            voice_model = self.voice_models[main_voice_index]
+        :param batch_size: Batch size for training.
+        :param num_epochs: Number of epochs to train for.
+        :param details: Dictionary containing training details and parameters.
+        """
+        self.train_phase()  # Ensure all models are in training mode
+
+        for voice_index in range(self.num_voices):
+            voice_model = self.voice_models[voice_index]
             if self.activate_cuda:
                 voice_model.cuda()
             optimizer = optim.Adam(voice_model.parameters())
-            voice_model.train_model(batch_size=batch_size, num_epochs=num_epochs, num_iterations=num_iterations, optimizer=optimizer, **kwargs)
 
+            # Train each voice model
+            voice_model.train_model(optimizer=optimizer, batch_size=batch_size, num_epochs=num_epochs, details=details)
+
+            # Optionally, save the model after training
+            if details is not None:
+                voice_model.save(details)
 
     def eval_phase(self):
         for voice_model in self.voice_models:
@@ -109,7 +250,8 @@ class DeepBach:
                    time_index_range_ticks=None,
                    voice_index_range=None,
                    fermatas=None,
-                   random_init=True
+                   random_init=True,
+                   details=None
                    ):
         """
 
@@ -213,6 +355,32 @@ class DeepBach:
             tensor_score=tensor_chorale,
             fermata_tensor=tensor_metadata[:, :, metadata_index])
 
+        # Folder where you want to save the scores
+        save_folder = 'GeneratedScores'
+
+        # Ensure the folder exists
+        if not os.path.exists(save_folder):
+            os.makedirs(save_folder)
+
+        # Construct the filename from details
+        if details is not None:
+            filename_parts = [f"{key}{value}" for key, value in details.items()]
+            filename = f"model_{'_'.join(filename_parts)}.xml"
+        else:
+            filename = "generated_score.xml"
+
+        # Full path for the file
+        full_save_path = os.path.join(save_folder, filename)
+
+        # Save the score
+        try:
+            score.write('musicxml', full_save_path)
+            print(f"Score saved as {full_save_path}")
+        except Exception as e:
+            print(f"Error saving score: {e}")
+
+        return score, tensor_chorale, tensor_metadata
+
         return score, tensor_chorale, tensor_metadata
 
     def parallel_gibbs(self,
@@ -298,21 +466,17 @@ class DeepBach:
 
                 # reshape batches
                 batch_notes = list(map(list, zip(*batch_notes)))
-                batch_notes = [torch.cat(lcr) if lcr[0] is not None else None for lcr in batch_notes]
+                batch_notes = [torch.cat(lcr) if lcr[0] is not None else None
+                               for lcr in batch_notes]
                 batch_metas = list(map(list, zip(*batch_metas)))
-                batch_metas = [torch.cat(lcr) for lcr in batch_metas]
+                batch_metas = [torch.cat(lcr)
+                               for lcr in batch_metas]
 
-                # Forward pass
-                probas[voice_index] = self.voice_models[voice_index].forward(batch_notes, batch_metas)
-
-
-
-                # Apply softmax only if the result is not a tuple
-                if not isinstance(probas[voice_index], tuple):
-                    probas[voice_index] = nn.Softmax(dim=1)(probas[voice_index])
-                else:
-                    # Ignore and move on without altering other values
-                    continue
+                # make all estimations
+                probas[voice_index] = (self.voice_models[voice_index]
+                                       .forward(batch_notes, batch_metas)
+                                       )
+                probas[voice_index] = nn.Softmax(dim=1)(probas[voice_index])
 
             # update all predictions
             for voice_index in range(start_voice, end_voice):
@@ -342,4 +506,3 @@ class DeepBach:
                                            volatile=True)
 
         return tensor_chorale_no_cuda[0, :, timesteps_ticks:-timesteps_ticks]
-

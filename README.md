@@ -48,40 +48,40 @@ python -c 'import music21; music21.environment.set("musicxmlPath", "/bin/true")'
 Usage: deepBach.py [OPTIONS]
 
 Options:
-  --note_embedding_dim INTEGER    size of the note embeddings
-  --meta_embedding_dim INTEGER    size of the metadata embeddings
-  --num_layers INTEGER            number of layers of the LSTMs
-  --lstm_hidden_size INTEGER      hidden size of the LSTMs
-  --dropout_lstm FLOAT            amount of dropout between LSTM layers
-  --linear_hidden_size INTEGER    hidden size of the Linear layers
-  --batch_size INTEGER            training batch size
-  --num_epochs INTEGER            number of training epochs
-  --train                         train or retrain the specified model
-  --num_iterations INTEGER        number of parallel pseudo-Gibbs sampling
-                                  iterations
-  --sequence_length_ticks INTEGER
-                                  length of the generated chorale (in ticks)
-                                  
-  --batch_size,--num_epochs,--num_iterations,--timestamp
-                                  elements of the matching model to load
-  
-  --weights_paths                 path to the weights of the model to load prior to training/loading for generations
+  --note_embedding_dim INTEGER    Size of the note embeddings. Default: 20
+  --meta_embedding_dim INTEGER    Size of the metadata embeddings. Default: 20
+  --num_layers INTEGER            Number of layers of the LSTMs. Default: 2
+  --lstm_hidden_size INTEGER      Hidden size of the LSTMs. Default: 256
+  --dropout_lstm FLOAT            Amount of dropout between LSTM layers. Default: 0.5
+  --linear_hidden_size INTEGER    Hidden size of the Linear layers. Default: 256
+  --batch_size INTEGER            Training batch size. Default: 256
+  --num_epochs INTEGER            Number of training epochs. Default: 5
+  --train                         Flag to train or retrain the specified model. Default: False
+  --num_iterations INTEGER        Number of parallel pseudo-Gibbs sampling iterations. Default: 500
+  --sequence_length_ticks INTEGER Length of the generated chorale (in ticks). Default: 64
+  --load TEXT                     Parameters to load models. Format: 'param1=value1,param2=value2,...'
+
   --help                          Show this message and exit.
+
 ```
 
-## Examples
-You can generate a four-bar chorale with the pretrained model and display it in MuseScore  by 
-simply running (music21 setup is requried)
-```
-python deepBach.py
-```
+### Command Line Options
 
-You can train a new model from scratch by adding the `--train` flag.
-Added command line options are passed to the model constructor. For instance, to train a model with pretrained weights,
-to load a model with pretrained weights, to load a specific model by adding the --paths_weights flag which contains either
-of the matching parts in the file name, such as iterations, batches, time and so on. 
+- **Training a New Model**: Use the `--train` flag to train a new model from scratch. This initiates the training process with the specified parameters.
 
+- **Loading Pretrained Models**: To load a pretrained model, use the `--load` flag followed by specific parameters like `ep=1,ni=30`. This command searches for models matching the specified parameters in their filenames, such as epochs (`ep`), number of iterations (`ni`), and other relevant attributes.
 
+- **Model Configuration via Command Line**: Command line options are directly passed to the model constructor. This allows for dynamic adjustment of model parameters like embedding dimensions, LSTM sizes, and layer counts.
+
+- **Filename-Based Model Adaptation**: When loading models, `DeepBach` dynamically adjusts the voice models' architecture to align with the configurations indicated in the model filenames. This feature facilitates seamless transitions between different model states and configurations.
+
+- **Saving Models with Parameterized Filenames**: Models are saved with filenames that encapsulate key training parameters, enabling easy identification and retrieval of specific model states for future use or further training.
+
+### Example Commands
+
+- To train a new model: `python deepBach.py --train --num_epochs=5 --batch_size=256`
+- To load a specific pretrained model: `python deepBach.py --load ep=1,ni=30`
+- To generate music with a specific model: `python deepBach.py --num_iterations=500 --sequence_length_ticks=64 --load ep=1,ni=30`
 ## Usage with NONOTO
 The command 
 ```
@@ -112,9 +112,7 @@ python musescore_flask_server.py
 MuseScore3.5,and 4 can be set by configuration option from music21, and mainly for analysis 
 during the course of modifications,for interactive use, the server is used.
 
-
 ### Issues
-
 ### Music21 editor not set
 
 ```

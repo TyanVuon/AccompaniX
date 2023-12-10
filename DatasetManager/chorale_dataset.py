@@ -10,6 +10,7 @@ from DatasetManager.helpers import standard_name, SLUR_SYMBOL, START_SYMBOL, END
     standard_note, OUT_OF_RANGE, REST_SYMBOL
 from DatasetManager.metadata import FermataMetadata
 from DatasetManager.music_dataset import MusicDataset
+from DatasetManager.metadata import TickMetadata, IsPlayingMetadata, ModeMetadata, KeyMetadata, FermataMetadata
 
 
 class ChoraleDataset(MusicDataset):
@@ -47,6 +48,25 @@ class ChoraleDataset(MusicDataset):
         self.voice_ranges = None  # in midi pitch
         self.metadatas = metadatas
         self.subdivision = subdivision
+        # Initialize metadata_values
+        self.metadata_values = self.initialize_metadata_values(metadatas, subdivision)
+
+    def initialize_metadata_values(self, metadatas, subdivision):
+        metadata_values = {}
+        for metadata in metadatas:
+            if isinstance(metadata, TickMetadata):
+                metadata_values['TickMetadata'] = subdivision
+            elif isinstance(metadata, IsPlayingMetadata):
+                metadata_values['IsPlayingMetadata'] = 2  # Playing or not playing
+            elif isinstance(metadata, ModeMetadata):
+                metadata_values['ModeMetadata'] = 3  # Major, minor, or other
+            elif isinstance(metadata, KeyMetadata):
+                metadata_values['KeyMetadata'] = 16  # Number of sharps/flats
+            elif isinstance(metadata, FermataMetadata):
+                metadata_values['FermataMetadata'] = 2  # With or without fermata
+            # Add similar lines for other metadata types if any
+            self.metadata_values = metadata_values
+        return metadata_values
 
     def __repr__(self):
         return f'ChoraleDataset(' \
