@@ -1,2 +1,4 @@
 C:/Users/Tyan/Oct19thDeepBach/DeepBachTyan/PreTrainedBash filter=lfs diff=lfs merge=lfs -text
 C:/Users/Tyan/Oct19thDeepBach/DeepBachTyan/DatasetManager/dataset_cache/tensor_datasets filter=lfs diff=lfs merge=lfs -text
+DatasetManager/dataset_cache/tensor_datasets/* filter=lfs diff=lfs merge=lfs -text
+PreTrainedBash/* filter=lfs diff=lfs merge=lfs -text
