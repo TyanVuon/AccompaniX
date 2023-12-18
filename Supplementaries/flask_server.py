@@ -1,3 +1,9 @@
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+
 from DatasetManager.chorale_dataset import ChoraleDataset
 from DatasetManager.dataset_manager import DatasetManager
 from DatasetManager.metadata import FermataMetadata, TickMetadata, KeyMetadata
@@ -32,6 +38,10 @@ xml_response_headers = {"Content-Type": "text/xml",
                         }
 mp3_response_headers = {"Content-Type": "audio/mpeg3"
                         }
+#  create an interface in the flask_server.py file that will call the relevant functions from deepBach.py. This approach ensures that flask_server.py does not duplicate code from deepBach.py, but instead leverages its functionality as needed.
+#
+# To integrate flask_server.py with deepBach.py
+#
 
 deepbach = None
 _num_iterations = None
@@ -89,8 +99,11 @@ def get_fermatas_tensor(metadata_tensor: torch.Tensor) -> torch.Tensor:
               help='length of the generated chorale (in ticks)')
 @click.option('--ticks_per_quarter', default=4,
               help='number of ticks per quarter note')
+@click.option('--num_epochs', default=5, help='number of training epochs')  # Added
+@click.option('--batch_size', default=256, help='training batch size')  # Added
 @click.option('--port', default=5000,
               help='port to serve on')
+
 def init_app(note_embedding_dim,
              meta_embedding_dim,
              num_layers,
@@ -100,6 +113,8 @@ def init_app(note_embedding_dim,
              num_iterations,
              sequence_length_ticks,
              ticks_per_quarter,
+             num_epochs,
+             batch_size,
              port
              ):
     global metadatas
@@ -133,9 +148,11 @@ def init_app(note_embedding_dim,
         num_layers=num_layers,
         lstm_hidden_size=lstm_hidden_size,
         dropout_lstm=dropout_lstm,
-        linear_hidden_size=linear_hidden_size
+        linear_hidden_size=linear_hidden_size,
+        num_epochs=num_epochs,  # Added num_epochs
+        batch_size=batch_size  # Added batch_size
     )
-    deepbach.load()
+    deepbach.load_models()
     deepbach.cuda()
 
     # launch the script

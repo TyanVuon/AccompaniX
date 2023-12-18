@@ -48,6 +48,15 @@ def main(note_embedding_dim, meta_embedding_dim, num_layers, lstm_hidden_size, d
         'KeyMetadata': 16,  # KeyMetadata has 16 values (number of sharps/flats)
         'FermataMetadata': 2  # FermataMetadata has 2 values (with or without fermata)
     }
+    deepbach = DeepBach(dataset=dataset,
+                        note_embedding_dim=note_embedding_dim,
+                        meta_embedding_dim=meta_embedding_dim,
+                        num_layers=num_layers,
+                        lstm_hidden_size=lstm_hidden_size,
+                        dropout_lstm=dropout_lstm,
+                        linear_hidden_size=linear_hidden_size,
+                        num_epochs=num_epochs,
+                        batch_size=batch_size)
 
     if load:
         load_params = dict(param.split('=') for param in load.split(','))

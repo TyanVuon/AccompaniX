@@ -26,10 +26,14 @@ class VoiceModel(nn.Module):
                  lstm_hidden_size: int,
                  dropout_lstm: float,
                  num_epochs: int,
+                 num_notes_per_voice: list,
                  hidden_size_linear=int,
                  batch_size=int,
                  metadata_values=dict
     ):
+        #("Type of metadata_values in VoiceModel:", type(metadata_values))
+        #print("Contents of metadata_values in VoiceModel:", metadata_values)
+
     # Reordered hidden_size_linear and num_epochs is 200 supposedly
         super(VoiceModel, self).__init__()
         self.dataset = dataset
@@ -98,11 +102,16 @@ class VoiceModel(nn.Module):
 
         self.tenor_cache = []  # Initialization of the cache
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+        #print("Type of metadata_values just before error:", type(metadata_values))
+        #print("Contents of metadata_values just before error:", metadata_values)
+
         self.num_metadata_values = sum(metadata_values.values())
         self.cache_names = ['m3cache', 'm2cache', 'm1cache', 'm05cache', 'p05cache', 'p1cache', 'p2cache', 'p3cache']
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.to(self.device)  # Move the model to the correct device
+        self.num_notes_per_voice = num_notes_per_voice
 
         cache_size = 16  # Assuming a fixed size for the cache
         for cache_name in self.cache_names:
@@ -390,13 +399,13 @@ class VoiceModel(nn.Module):
                         mismatch = False
                         break
             if mismatch:
-                penalty += 1
+                penalty += 0.1
 
         return penalty
 
-    def modified_loss_function(self, predictions, label, pitch_diff_labels, penalty_weight=0.1,
-                               incentive_weight=0.05,
-                               pitch_diff_loss_weight=1.0):
+    def modified_loss_function(self, predictions, label, pitch_diff_labels, penalty_weight=0.01,
+                               incentive_weight=0.005,
+                               pitch_diff_loss_weight=0.1):
         """
         Custom loss function that combines classification loss with custom penalty, incentives, and pitch difference loss.
         """
@@ -454,7 +463,7 @@ class VoiceModel(nn.Module):
         penalty = 0
         for diff in voice_diffs:
             if diff not in expanded_tenor_diffs:
-                penalty += 1
+                penalty += 0.1
         return penalty
 
         ## Loss Calculation Methods
@@ -515,67 +524,81 @@ class VoiceModel(nn.Module):
         os.makedirs(save_dir, exist_ok=True)
         save_path = os.path.join(save_dir, filename)
 
-        # Attempt to save the model
-        try:
-            torch.save(self.state_dict(), save_path)
-            print(f"Model successfully saved as {filename}")
-        except Exception as e:
-            print(f"Failed to save the model: {e}")
+        # Prepare the model state and num_notes_per_voice for saving
+        save_state = {
+            'state_dict': self.state_dict(),
+            'num_notes_per_voice': self.num_notes_per_voice  # Include num_notes_per_voice in the saved state
+        }
+        torch.save(save_state, save_path)
 
 
     def __repr__(self):
         return f'model_Dec09th17h_vi{self.main_voice_index}_ep{self.num_epochs}_bs{self.batch_size}_ni{self.note_embedding_dim}_lhs{self.lstm_hidden_size}_ned{self.num_layers}_med{self.meta_embedding_dim}'
 
+    # Save the state dictionary at the end of training
+    def save_state_dict(self, file_path):
+        torch.save(self.state_dict(), file_path)
+
     def train_model(self, batch_size=16, num_epochs=10, optimizer=None, details=None):
+
+        # Print the loaded model file name at the start of training
+        loaded_model_file = getattr(self, 'loaded_model_file', 'Unknown')
+        print(f"Training model loaded from file: {loaded_model_file}")
+
         if details is None:
             print("Warning: 'details' dictionary not provided. Model will not be saved.")
         else:
             print(f"Training Details: {details}")
 
+        (dataloader_train, dataloader_val, _) = self.dataset.data_loaders(batch_size=batch_size)
+        total_steps = self.num_voices * num_epochs * len(self.dataset.data_loaders(batch_size=batch_size)[0])
+        progress_bar = tqdm(total=total_steps, desc="Overall Training Progress")
+
         for epoch in tqdm(range(num_epochs), desc="Training Progress"):
             print(f'===Epoch {epoch}/{num_epochs}===')
-            (dataloader_train, dataloader_val, _) = self.dataset.data_loaders(batch_size=batch_size)
 
             # Training phase On
             self.train()  # Switch to training mode
 
-            # Training phase
-            for batch_idx, (tensor_chorale, tensor_metadata) in enumerate(dataloader_train):
-                ##print(f'Processing batch {batch_idx + 1}/{len(dataloader_train)} in training')
-                tensor_chorale = cuda_variable(tensor_chorale).long()
-                tensor_metadata = cuda_variable(tensor_metadata).long()
+            # Initialize the progress bar for the current epoch
+            with tqdm(total=len(dataloader_train), desc=f"Epoch {epoch}/{num_epochs} Batch Progress") as epoch_progress:
+                # Training phase
+                for batch_idx, (tensor_chorale, tensor_metadata) in enumerate(dataloader_train):
+                    ##print(f'Processing batch {batch_idx + 1}/{len(dataloader_train)} in training')
+                    tensor_chorale = cuda_variable(tensor_chorale).long()
+                    tensor_metadata = cuda_variable(tensor_metadata).long()
 
-                # Get processed inputs
-                notes, metas, label = self.preprocess_input(tensor_chorale, tensor_metadata)
-                # If pitch_diff_labels are part of your model, uncomment the next line
-                pitch_diff_labels = self.extract_pitch_differences_from_tensor(tensor_chorale)
+                    # Get processed inputs
+                    notes, metas, label = self.preprocess_input(tensor_chorale, tensor_metadata)
+                    # If pitch_diff_labels are part of your model, uncomment the next line
+                    pitch_diff_labels = self.extract_pitch_differences_from_tensor(tensor_chorale)
 
-                # Forward pass
-                predictions = self.forward(notes, metas)
-                ##print("Predictions data type before loss:", predictions.dtype)
+                    # Forward pass
+                    predictions = self.forward(notes, metas)
+                    ##print("Predictions data type before loss:", predictions.dtype)
 
-                # Ensure label is of type torch.long
-                label = label.long()
-                ##print("Label data type before loss:", label.dtype)
+                    # Ensure label is of type torch.long
+                    label = label.long()
+                    ##print("Label data type before loss:", label.dtype)
 
+                    # Calculate loss
+                    # If pitch_diff_labels are used, replace 'label' with 'pitch_diff_labels' in the next line
+                    loss = self.modified_loss_function(predictions, label, pitch_diff_labels) if hasattr(self,'modified_loss_function') \
+                        else nn.CrossEntropyLoss()(predictions, label)
+                    ##print(f'Batch {batch_idx + 1}: Training loss calculated.')
+                    ##print("Loss data type before backward:", loss.dtype)
 
-                # Calculate loss
-                # If pitch_diff_labels are used, replace 'label' with 'pitch_diff_labels' in the next line
-                loss = self.modified_loss_function(predictions, label, pitch_diff_labels) if hasattr(self,'modified_loss_function') \
-                    else nn.CrossEntropyLoss()(predictions, label)
-                print(f'Batch {batch_idx + 1}: Training loss calculated.')
-                ##print("Loss data type before backward:", loss.dtype)
-
-                # Backpropagation
-                if optimizer:
-                    optimizer.zero_grad()
-                    loss.backward()
-                    optimizer.step()
-                    ##print(f'Batch {batch_idx + 1}: Backpropagation completed.')
-
-            # Calculate training loss and accuracy
-            train_loss, train_acc = self.loss_and_acc(dataloader_train, optimizer=optimizer, phase='train')
-            print(f'Epoch {epoch}: Training loss = {train_loss}, Accuracy = {train_acc}%')
+                    # Backpropagation
+                    if optimizer:
+                        optimizer.zero_grad()
+                        loss.backward()
+                        optimizer.step()
+                        ##print(f'Batch {batch_idx + 1}: Backpropagation completed.')
+                    # Update the progress bar after each batch
+                    epoch_progress.update(1)
+                # Calculate training loss and accuracy
+                train_loss, train_acc = self.loss_and_acc(dataloader_train, optimizer=optimizer, phase='train')
+                print(f'Epoch {epoch}: Training loss = {train_loss}, Accuracy = {train_acc}%')
 
 
             # Validation phase On
@@ -589,7 +612,13 @@ class VoiceModel(nn.Module):
             if details is not None:
                 self.save(details)
 
+
         print("Training completed.")
+
+        # At the end of training, save the state dictionary
+        if details is not None:
+            save_file_path = os.path.join('models', f'model_state_dict_{details["num_epochs"]}_epochs.pt')
+            self.save_state_dict(save_file_path)
 
     def loss_and_acc(self, dataloader,
                      optimizer=None,
@@ -637,7 +666,7 @@ class VoiceModel(nn.Module):
         return average_loss, average_acc
 
     def accuracy(self, weights, target):
-        batch_size, = target.size()
+        batch_size = target.size()
         softmax = nn.Softmax(dim=1)(weights)
         pred = softmax.max(1)[1].type_as(target)
         num_corrects = (pred == target).float().sum()

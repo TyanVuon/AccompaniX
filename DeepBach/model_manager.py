@@ -28,12 +28,29 @@ class DeepBach:
                  batch_size
                  ):
         self.dataset = dataset
+        self.note_embedding_dim = note_embedding_dim
+        self.meta_embedding_dim = meta_embedding_dim
+        self.num_layers = num_layers
+        self.lstm_hidden_size = lstm_hidden_size
+        self.dropout_lstm = dropout_lstm
+        self.linear_hidden_size = linear_hidden_size
+        self.num_epochs = num_epochs
+        self.batch_size = batch_size
         self.num_voices = self.dataset.num_voices
         self.num_metas = len(self.dataset.metadatas) + 1
         self.activate_cuda = torch.cuda.is_available()
+        # Calculate num_notes_per_voice and set it as an attribute
+        self.num_notes_per_voice = [len(d) for d in self.dataset.note2index_dicts]
+
         # Ensure that metadata_values is initialized in the dataset
         if not hasattr(self.dataset, 'metadata_values'):
             self.dataset.initialize_metadata_values(self.dataset.metadatas, self.dataset.subdivision)
+
+        # Calculate num_notes_per_voice
+        num_notes_per_voice = [len(d) for d in self.dataset.note2index_dicts]
+        #print(type(self.dataset.metadata_values), self.dataset.metadata_values)
+        #print("Type of self.dataset.metadata_values:", type(self.dataset.metadata_values))
+        #print("Contents of self.dataset.metadata_values:", self.dataset.metadata_values)
 
         self.voice_models = [VoiceModel(
             dataset=self.dataset,
@@ -46,7 +63,8 @@ class DeepBach:
             num_epochs=num_epochs,
             hidden_size_linear=linear_hidden_size,
             batch_size=batch_size,
-            metadata_values=self.dataset.metadata_values
+            metadata_values=self.dataset.metadata_values,
+            num_notes_per_voice=num_notes_per_voice  # Pass the calculated num_notes_per_voice
         )
             for main_voice_index in range(self.num_voices)
         ]
@@ -94,6 +112,10 @@ class DeepBach:
         for i, model in enumerate(self.voice_models):
             print(f"Voice model {i} architecture: {model}")
 
+        #print("Type of metadata_values before VoiceModel instances:", type(self.dataset.metadata_values))
+        #print("Contents of metadata_values before VoiceModel instances:", self.dataset.metadata_values)
+
+
         # Use provided values or set default values based on click.options
         num_epochs = num_epochs if num_epochs is not None else 5  # Set a default value for num_epochs
         note_embedding_dim = note_embedding_dim if note_embedding_dim is not None else 20  # Default from click.option
@@ -113,8 +135,16 @@ class DeepBach:
             lstm_hidden_size=lstm_hidden_size,
             dropout_lstm=dropout_lstm,
             hidden_size_linear=linear_hidden_size,
-            num_epochs=num_epochs
+            num_epochs=num_epochs,
+            metadata_values=self.dataset.metadata_values,
+            num_notes_per_voice=self.num_notes_per_voice
         ) for voice_index in range(self.num_voices)]
+
+
+        # Debug: Print type and contents after reinitialization
+        #print("Type of metadata_values after reinitialization in configure method outlet:", type(self.dataset.metadata_values))
+        #print("Contents of metadata_values after reinitialization in configure method outlet:", self.dataset.metadata_values)
+
         # Print new architecture
         print("New architecture after configuration:")
         for i, model in enumerate(self.voice_models):
@@ -160,20 +190,14 @@ class DeepBach:
                             file_to_load = voice_files[0]  # Load the first matching file
                             print(f"Loading file for voice {voice_index}: {file_to_load}")
                             params = self.extract_params_from_filename(file_to_load)
+
                             self.configure_voice_models(**params)
-                            state_dict = torch.load(file_to_load)
-                            model_state_dict_keys = set(self.voice_models[voice_index].state_dict().keys())
-                            loaded_state_dict_keys = set(state_dict.keys())
-                            if model_state_dict_keys.issubset(loaded_state_dict_keys):
-                                print(f"Model for voice {voice_index} loaded correctly.")
-                                self.voice_models[voice_index].load_state_dict(state_dict)
-                            else:
-                                print(
-                                    f"Model for voice {voice_index} did not load correctly. Mismatch in state dict keys.")
-                                print("Model's state dict keys:", model_state_dict_keys)
-                                print("Loaded state dict keys:", loaded_state_dict_keys)
-                        else:
-                            print(f"No files found for voice {voice_index}.")
+
+                            # Loading the state dictionary directly from the file
+                            loaded_data = torch.load(file_to_load)
+                            state_dict = loaded_data['state_dict']
+                            self.voice_models[voice_index].load_state_dict(state_dict)
+                            self.voice_models[voice_index].loaded_model_file = file_to_load
             else:
                 print("No matching models found.")
         else:
@@ -183,13 +207,36 @@ class DeepBach:
                 print(
                     f"Not enough model files found in 'models/' directory. Expected {self.num_voices}, found {len(model_files)}.")
                 return
+
             for voice_index in range(self.num_voices):
                 model_file = model_files[voice_index]
                 print(f"Loading model from file: {model_file}")
-                state_dict = torch.load(model_file)
-                self.voice_models[voice_index].load_state_dict(state_dict)
 
-    # # Example usage:
+                # Load the saved model state and num_notes_per_voice
+                saved_model = torch.load(model_file)
+
+                # Reinitialize the VoiceModel with the instance variables
+                self.voice_models[voice_index] = VoiceModel(
+                    dataset=self.dataset,
+                    main_voice_index=voice_index,
+                    note_embedding_dim=self.note_embedding_dim,
+                    meta_embedding_dim=self.meta_embedding_dim,
+                    num_layers=self.num_layers,
+                    lstm_hidden_size=self.lstm_hidden_size,
+                    dropout_lstm=self.dropout_lstm,
+                    num_epochs=self.num_epochs,
+                    hidden_size_linear=self.linear_hidden_size,
+                    batch_size=self.batch_size,
+                    metadata_values=self.dataset.metadata_values,
+                    num_notes_per_voice=self.num_notes_per_voice
+                )
+
+                # Loading the state dictionary directly from the file
+                state_dict = saved_model['state_dict']
+                self.voice_models[voice_index].load_state_dict(state_dict)
+                self.voice_models[voice_index].loaded_model_file = model_file
+
+    # # Example u
 # search_params = {'ep': 1, 'ni': 1, 'ned': 20}  # Add more parameters as needed
 # deepbach_model = DeepBach(...)
 # deepbach_model.load_models(search_params=search_params)
