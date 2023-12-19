@@ -535,9 +535,10 @@ class VoiceModel(nn.Module):
     def __repr__(self):
         return f'model_Dec09th17h_vi{self.main_voice_index}_ep{self.num_epochs}_bs{self.batch_size}_ni{self.note_embedding_dim}_lhs{self.lstm_hidden_size}_ned{self.num_layers}_med{self.meta_embedding_dim}'
 
-    # Save the state dictionary at the end of training
-    def save_state_dict(self, file_path):
-        torch.save(self.state_dict(), file_path)
+    # # Save the state dictionary at the end of training
+    # def save_state_dict(self, file_path):
+    #     torch.save(self.state_dict(), file_path)   necessity up for debate
+    # as Save in general has already been saving state dic within .pt files.
 
     def train_model(self, batch_size=16, num_epochs=10, optimizer=None, details=None):
 
@@ -618,7 +619,8 @@ class VoiceModel(nn.Module):
         # At the end of training, save the state dictionary
         if details is not None:
             save_file_path = os.path.join('models', f'model_state_dict_{details["num_epochs"]}_epochs.pt')
-            self.save_state_dict(save_file_path)
+            torch.save(self.state_dict(), save_file_path)
+
 
     def loss_and_acc(self, dataloader,
                      optimizer=None,
@@ -670,7 +672,7 @@ class VoiceModel(nn.Module):
         softmax = nn.Softmax(dim=1)(weights)
         pred = softmax.max(1)[1].type_as(target)
         num_corrects = (pred == target).float().sum()
-        return num_corrects / batch_size * 100
+        return num_corrects / batch_size[0] * 100
 
 
 
